@@ -21,14 +21,20 @@ module.exports = {
         'react-router-dom': {
           singleton: true,
           import: false,
-          requiredVersion: '^6.3.0',
+          version: '^6.3.0',
         },
       },
     ],
   },
   routes: {
-    '/api/chrome-service/v1/static': {
-      host: 'http://localhost:8000',
-    },
+    ...(process.env.REMOTE_CONFIG && {
+      '/api/chrome-service/v1/static': {
+        host: `http://localhost:${
+          isNaN(Number(process.env.REMOTE_CONFIG))
+            ? 8080
+            : process.env.REMOTE_CONFIG
+        }`,
+      },
+    }),
   },
 };

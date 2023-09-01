@@ -2,7 +2,10 @@ import {
   Button,
   Form,
   FormGroup,
+  FormHelperText,
   FormProps,
+  HelperText,
+  HelperTextItem,
   Modal,
   ModalVariant,
   Popover,
@@ -97,11 +100,6 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           label={'Short description'}
           isRequired
           fieldId="short-description-field"
-          helperTextInvalid={
-            validity !== 'valid' ? HELPER_TEXT[validity] : undefined
-          }
-          validated={validated}
-          helperText={HELPER_TEXT['invalid-format']}
           labelIcon={
             <Popover
               headerContent={
@@ -118,7 +116,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
                 type={'button'}
                 onClick={(e) => e.preventDefault()}
               >
-                <HelpIcon noVerticalAlign />
+                <HelpIcon />
               </button>
             </Popover>
           }
@@ -129,12 +127,21 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
             id="text-input-short-description"
             name="text-input-short-description"
             value={name}
-            onChange={setName}
+            onChange={(_event, val) => setName(val)}
             onBlur={doValidate}
             validated={validated}
             autoFocus={true}
             ouiaId={'text-input'}
           />
+          <FormHelperText>
+            <HelperText>
+              <HelperTextItem>
+                {validity !== 'valid'
+                  ? HELPER_TEXT[validity]
+                  : HELPER_TEXT['invalid-format']}
+              </HelperTextItem>
+            </HelperText>
+          </FormHelperText>
         </FormGroup>
       </Form>
     </Modal>

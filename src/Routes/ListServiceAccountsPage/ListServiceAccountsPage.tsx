@@ -32,8 +32,8 @@ const ListServiceAccountsPage = () => {
       const env = getEnvironmentDetails();
       const token = await auth.getToken();
       const response = await fetchServiceAccounts({
-        token,
-        sso: env.sso,
+        token: token as string,
+        sso: env?.sso as string,
         page,
         perPage,
       });

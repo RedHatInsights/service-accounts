@@ -57,7 +57,6 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
       ) : (
         <Bullseye>
           <Spinner
-            isSVG={true}
             aria-label={'Loading service account information'}
             size={'xl'}
           />

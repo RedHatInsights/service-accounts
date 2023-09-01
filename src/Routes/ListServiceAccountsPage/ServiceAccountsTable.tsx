@@ -1,12 +1,13 @@
 import {
   Button,
   EmptyState,
+  EmptyStateActions,
   EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateIcon,
-  EmptyStatePrimary,
   Pagination,
   Skeleton,
-  Title,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
@@ -14,7 +15,7 @@ import {
 import { SearchIcon } from '@patternfly/react-icons';
 import {
   ActionsColumn,
-  TableComposable,
+  Table /* data-codemods */,
   Tbody,
   Td,
   Th,
@@ -90,12 +91,8 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
             />
           </ToolbarItem>
           {page === 1 && serviceAccounts.length < perPage ? null : (
-            <ToolbarItem
-              variant="pagination"
-              alignment={{ default: 'alignRight' }}
-            >
+            <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
               <Pagination
-                perPageComponent="button"
                 toggleTemplate={({ firstIndex, lastIndex }) => (
                   <>
                     <b>
@@ -120,7 +117,7 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
         </ToolbarContent>
       </Toolbar>
 
-      <TableComposable aria-label="List of created service accounts">
+      <Table aria-label="List of created service accounts">
         <Thead>
           <Tr>
             <Th>Description</Th>
@@ -147,7 +144,7 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
                   <Skeleton />
                 </Td>
                 <Td isActionCell={true}>
-                  <ActionsColumn isDisabled={true} />
+                  <ActionsColumn isDisabled={true} items={[]} />
                 </Td>
               </Tr>
             ))}
@@ -182,27 +179,30 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
           {!isLoading && serviceAccounts.length === 0 && (
             <Td colSpan={5}>
               <EmptyState>
-                <EmptyStateIcon icon={SearchIcon} />
-                <Title size="lg" headingLevel="h4">
-                  No results found
-                </Title>
+                <EmptyStateHeader
+                  titleText="No results found"
+                  icon={<EmptyStateIcon icon={SearchIcon} />}
+                  headingLevel="h4"
+                />
                 <EmptyStateBody>
                   No results match the filter criteria. Clear all filters and
                   try again.
                 </EmptyStateBody>
-                <EmptyStatePrimary>
-                  <Button
-                    variant="link"
-                    onClick={() => onPaginationChange(1, perPage)}
-                  >
-                    Clear all filters
-                  </Button>
-                </EmptyStatePrimary>
+                <EmptyStateFooter>
+                  <EmptyStateActions>
+                    <Button
+                      variant="link"
+                      onClick={() => onPaginationChange(1, perPage)}
+                    >
+                      Clear all filters
+                    </Button>
+                  </EmptyStateActions>
+                </EmptyStateFooter>
               </EmptyState>
             </Td>
           )}
         </Tbody>
-      </TableComposable>
+      </Table>
     </>
   );
 };

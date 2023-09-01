@@ -24,7 +24,11 @@ const DeleteServiceAccountPage = () => {
     queryFn: async () => {
       const env = getEnvironmentDetails();
       const token = await auth.getToken();
-      return fetchServiceAccount({ clientId: clientId!, token, sso: env.sso });
+      return fetchServiceAccount({
+        clientId: clientId!,
+        token: token as string,
+        sso: env?.sso as string,
+      });
     },
     enabled: Boolean(clientId),
   });
@@ -51,7 +55,11 @@ const DeleteServiceAccountPage = () => {
   const onConfirm: DeleteModalProps['onConfirm'] = async () => {
     const env = getEnvironmentDetails();
     const token = await auth.getToken();
-    mutation.mutate({ clientId: clientId!, token, sso: env.sso });
+    mutation.mutate({
+      clientId: clientId!,
+      token: token as string,
+      sso: env?.sso as string,
+    });
   };
 
   useEffect(() => {

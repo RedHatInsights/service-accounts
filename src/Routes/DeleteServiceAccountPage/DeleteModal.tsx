@@ -57,7 +57,6 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
       ) : (
         <Bullseye>
           <Spinner
-            isSVG={true}
             aria-label={'Loading service account information'}
             size={'xl'}
           />

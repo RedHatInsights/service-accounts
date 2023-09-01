@@ -2,9 +2,10 @@ import {
   Button,
   EmptyState,
   EmptyStateBody,
+  EmptyStateFooter,
+  EmptyStateHeader,
   EmptyStateIcon,
   EmptyStateVariant,
-  Title,
 } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import type { VoidFunctionComponent } from 'react';
@@ -14,18 +15,21 @@ import { AppLink } from '../../shared/AppLink';
 export const EmptyStateNoServiceAccounts: VoidFunctionComponent = () => {
   return (
     <EmptyState variant={EmptyStateVariant.xs}>
-      <EmptyStateIcon icon={PlusCircleIcon} />
-      <Title headingLevel="h2" size="lg">
-        No service accounts yet
-      </Title>
+      <EmptyStateHeader
+        titleText="No service accounts yet"
+        icon={<EmptyStateIcon icon={PlusCircleIcon} />}
+        headingLevel="h2"
+      />
       <EmptyStateBody>To get started, create a service account.</EmptyStateBody>
-      <Button
-        ouiaId="button-create"
-        variant="primary"
-        component={(props) => <AppLink {...props} to={'create'} />}
-      >
-        Create service account
-      </Button>
+      <EmptyStateFooter>
+        <Button
+          ouiaId="button-create"
+          variant="primary"
+          component={(props) => <AppLink {...props} to={'create'} />}
+        >
+          Create service account
+        </Button>
+      </EmptyStateFooter>
     </EmptyState>
   );
 };
