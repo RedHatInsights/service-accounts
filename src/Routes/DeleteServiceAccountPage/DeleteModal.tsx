@@ -25,7 +25,7 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
     <Modal
       id="modalCreateServiceAccountReset"
       variant={ModalVariant.medium}
-      title={'Reset service account credentials?'}
+      title={'Delete service account?'}
       titleIconVariant={'warning'}
       isOpen={true}
       ouiaId={'modal-reset-service-account'}

@@ -102,15 +102,16 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           fieldId="short-description-field"
           labelIcon={
             <Popover
-              headerContent={
-                <div>{'serviceAccount.short_description_popover_title'}</div>
-              }
+              headerContent={<div>Short description</div>}
               bodyContent={
-                <div>{'serviceAccount.short_description_popover_body'}</div>
+                <div>
+                  Please provide simple and short description of service account
+                  you are creating
+                </div>
               }
             >
               <button
-                aria-label={'serviceAccount.short_description_popover_button'}
+                aria-label="short description of service account"
                 aria-describedby="short-description-field"
                 className="pf-c-form__group-label-help"
                 type={'button'}

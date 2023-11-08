@@ -11,6 +11,7 @@ import { Outlet, useSearchParams } from 'react-router-dom';
 import { fetchServiceAccounts } from '../../shared/fetchServiceAccounts';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
+import { Alert } from '@patternfly/react-core';
 
 const ListServiceAccountsPage = () => {
   const { appAction } = useChrome();
@@ -22,8 +23,7 @@ const ListServiceAccountsPage = () => {
   const { auth, getEnvironmentDetails } = useChrome();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get('page') || '', 10) || 1;
-  const perPage = parseInt(searchParams.get('perPage') || '', 10) || 10;
-  //
+  const perPage = parseInt(searchParams.get('perPage') || '', 10) || 50;
 
   const queryClient = useQueryClient();
   const results = useQuery({
@@ -57,6 +57,13 @@ const ListServiceAccountsPage = () => {
       </PageHeader>
       <Main>
         <>
+          {results.data?.serviceAccounts?.length === 50 && (
+            <Alert
+              variant="warning"
+              isInline
+              title="Note: You cannot create more than 50 service accounts. To stay within the limit, consider reviewing and deactivating unused or obsolete service accounts."
+            />
+          )}
           {(results.data || results.isLoading) &&
           results.data?.state !== 'no-service-accounts' ? (
             <ServiceAccountsTable

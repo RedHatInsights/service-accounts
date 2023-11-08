@@ -6,13 +6,13 @@ import {
   EmptyStateFooter,
   EmptyStateHeader,
   EmptyStateIcon,
-  Pagination,
   Skeleton,
   Toolbar,
   ToolbarContent,
   ToolbarItem,
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
+import { DateFormat } from '@redhat-cloud-services/frontend-components/DateFormat';
 import {
   ActionsColumn,
   Table /* data-codemods */,
@@ -22,60 +22,21 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import React, { VoidFunctionComponent } from 'react';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 
 import { ServiceAccount } from '../../types';
 
-const timeFormat = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
-
-function getRelativeTime(timestamp: number) {
-  const diff = timestamp - new Date().getTime();
-  const toSec = Math.floor(diff / 1000);
-  const toMin = Math.floor(toSec / 60);
-  const toHour = Math.floor(toMin / 60);
-  const toDays = Math.floor(toHour / 24);
-  const toWeeks = Math.floor(toDays / 7);
-  const toMonths = Math.floor(toWeeks / 4);
-  const toYears = Math.floor(toMonths / 12);
-  const [value, unit] = (() => {
-    switch (true) {
-      case Math.abs(toYears) > 1:
-        return [toYears, 'years' as const];
-      case Math.abs(toMonths) > 1:
-        return [toMonths, 'months' as const];
-      case Math.abs(toWeeks) > 1:
-        return [toWeeks, 'weeks' as const];
-      case Math.abs(toDays) > 1:
-        return [toDays, 'days' as const];
-      case Math.abs(toHour) > 1:
-        return [toHour, 'hours' as const];
-      case Math.abs(toMin) > 1:
-        return [toMin, 'minutes' as const];
-      default:
-        return [toSec, 'seconds' as const];
-    }
-  })();
-  return timeFormat.format(value, unit);
-}
-
-export const ServiceAccountsTable: VoidFunctionComponent<{
+export const ServiceAccountsTable: FC<{
   serviceAccounts: ServiceAccount[];
   page: number;
   perPage: number;
   hasMore: boolean;
   onPaginationChange: (page: number, perPage: number) => void;
   isLoading: boolean;
-}> = ({
-  serviceAccounts,
-  page,
-  perPage,
-  hasMore,
-  onPaginationChange,
-  isLoading,
-}) => {
+}> = ({ serviceAccounts, perPage, onPaginationChange, isLoading }) => {
   const navigate = useNavigate();
   return (
     <>
@@ -88,32 +49,9 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
                   Create service account
                 </AppLink>
               )}
+              isDisabled={serviceAccounts.length === 50}
             />
           </ToolbarItem>
-          {page === 1 && serviceAccounts.length < perPage ? null : (
-            <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
-              <Pagination
-                toggleTemplate={({ firstIndex, lastIndex }) => (
-                  <>
-                    <b>
-                      {firstIndex} - {lastIndex}
-                    </b>{' '}
-                    of <b>many</b>
-                  </>
-                )}
-                widgetId="indeterminate-example"
-                perPage={perPage}
-                page={page}
-                itemCount={hasMore ? undefined : page * perPage}
-                onSetPage={(_, page) => {
-                  onPaginationChange(page, perPage);
-                }}
-                onPerPageSelect={(_, perPage) => {
-                  onPaginationChange(1, perPage);
-                }}
-              />
-            </ToolbarItem>
-          )}
         </ToolbarContent>
       </Toolbar>
 
@@ -156,7 +94,7 @@ export const ServiceAccountsTable: VoidFunctionComponent<{
                 <Td dataLabel={'Client ID'}>{sa.clientId}</Td>
                 <Td dataLabel={'Owner'}>{sa.createdBy}</Td>
                 <Td dataLabel={'Time created'}>
-                  about {getRelativeTime(sa.createdAt * 1000)}
+                  <DateFormat date={sa.createdAt * 1000} />
                 </Td>
                 <Td isActionCell={true}>
                   <ActionsColumn
