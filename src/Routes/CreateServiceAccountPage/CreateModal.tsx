@@ -105,8 +105,8 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
               headerContent={<div>Short description</div>}
               bodyContent={
                 <div>
-                  Please provide simple and short description of service account
-                  you are creating
+                  Please provide a simple and short description of the service
+                  account you are creating
                 </div>
               }
             >
