@@ -45,7 +45,8 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
         <EmptyStateFooter>
           <TextContent>
             <Text component={TextVariants.small} className="pf-u-mt-lg">
-              Connect to the Kafka instance using this client ID and secret
+              Connect to Red Hat cloud services or APIs using this client ID and
+              secret
             </Text>
           </TextContent>
           <InputGroup className="pf-u-mt-lg">
