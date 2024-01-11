@@ -143,7 +143,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         }
       >
         <FormGroup
-          label={'Service Account Name'}
+          label="Service Account Name"
           isRequired
           fieldId="name-field"
           labelIcon={
@@ -187,7 +187,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           </FormHelperText>
         </FormGroup>
         <FormGroup
-          label={'Short description'}
+          label="Short description"
           isRequired
           fieldId="short-description-field"
         >
