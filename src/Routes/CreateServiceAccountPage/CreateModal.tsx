@@ -22,6 +22,7 @@ const MAX_SERVICE_ACCOUNT_DESC_LENGTH = 255;
 const HELPER_TEXT: { [key: string]: string } = {
   'empty-name':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
+  'empty-desc': 'Please provide a short description',
   'invalid-format':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
   'invalid-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_NAME_LENGTH} characters.`,
@@ -40,7 +41,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   type Validate = 'default' | 'error' | 'success';
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [inputFieldBlur, setinputFieldBlur] = React.useState(false);
+  const [inputFieldBlur, setInputFieldBlur] = React.useState(false);
   const [nameValidated, setNameValidated] = React.useState<Validate>('default');
   const [descriptionValidated, setDescriptionValidated] =
     React.useState<Validate>('default');
@@ -62,13 +63,11 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   };
 
   React.useEffect(() => {
-    if (isNameValid(name) === 'valid') {
+    const validationResult = isNameValid(name);
+    if (validationResult === 'valid') {
       setNameValidated('success');
       setNameHelperText(HELPER_TEXT['empty-name']);
-    } else if (name != '') {
-      setNameValidated('error');
-      setNameHelperText(HELPER_TEXT[isNameValid(name)]);
-    } else if (name == '' && inputFieldBlur) {
+    } else if (name != '' || (name == '' && inputFieldBlur)) {
       setNameValidated('error');
       setNameHelperText(HELPER_TEXT[isNameValid(name)]);
     }
@@ -76,7 +75,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
 
   const isDescriptionValid = (description: string) => {
     if (description === undefined || description.trim() === '') {
-      return 'empty-name' as const;
+      return 'empty-desc' as const;
     } else if (description.length > MAX_SERVICE_ACCOUNT_DESC_LENGTH) {
       return 'invalid-desc-length' as const;
     } else {
@@ -85,21 +84,17 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   };
 
   React.useEffect(() => {
-    if (isDescriptionValid(description) === 'valid') {
+    const validationResult = isDescriptionValid(description);
+    if (validationResult === 'valid') {
       setDescriptionValidated('success');
       setDescHelperText('');
-    } else if (description != '') {
-      setDescriptionValidated('error');
-      setDescHelperText(HELPER_TEXT[isDescriptionValid(description)]);
-    } else if (description == '' && inputFieldBlur) {
+    } else if (description != '' || (description == '' && inputFieldBlur)) {
       setDescriptionValidated('error');
       setDescHelperText(HELPER_TEXT[isDescriptionValid(description)]);
     }
   }, [description]);
 
-  const onBlurHandler = () => {
-    setinputFieldBlur(true);
-  };
+  const onBlurHandler = () => setInputFieldBlur(true);
 
   const handleSubmit: FormProps['onSubmit'] = (ev) => {
     ev.preventDefault();
@@ -114,7 +109,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       variant={ModalVariant.medium}
       title={'Create a service account'}
       isOpen={true}
-      ouiaId={'modal-create-service-account'}
+      ouiaId="modal-create-service-account"
       appendTo={appendTo}
       showClose={false}
       actions={[
@@ -183,7 +178,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
             onBlur={onBlurHandler}
             validated={nameValidated}
             autoFocus={true}
-            ouiaId={'text-input'}
+            ouiaId="text-input"
           />
           <FormHelperText>
             <HelperText>
@@ -205,7 +200,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
             onChange={(_event, val) => setDescription(val)}
             onBlur={onBlurHandler}
             validated={descriptionValidated}
-            ouiaId={'text-input-description'}
+            ouiaId="text-input-description"
           />
           <FormHelperText>
             <HelperText>
