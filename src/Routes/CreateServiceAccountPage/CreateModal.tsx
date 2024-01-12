@@ -18,56 +18,88 @@ import { appendTo } from '../../shared/utils';
 
 const FORM_ID = 'service-account-form';
 const MAX_SERVICE_ACCOUNT_NAME_LENGTH = 32;
-const HELPER_TEXT = {
+const MAX_SERVICE_ACCOUNT_DESC_LENGTH = 255;
+const HELPER_TEXT: { [key: string]: string } = {
   'empty-name':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
+  'empty-desc': 'Please provide a short description',
   'invalid-format':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
   'invalid-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_NAME_LENGTH} characters.`,
+  'invalid-desc-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_DESC_LENGTH} characters.`,
 };
 
 export type CreateModalProps = {
   isCreating: boolean;
-  onSubmit: (name: string) => void;
+  onSubmit: (name: string, description: string) => void;
 };
 
 export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   isCreating,
   onSubmit,
 }) => {
-  const [validate, setValidate] = useState(false);
+  type Validate = 'default' | 'error' | 'success';
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [inputFieldBlur, setInputFieldBlur] = React.useState(false);
+  const [nameValidated, setNameValidated] = React.useState<Validate>('default');
+  const [descriptionValidated, setDescriptionValidated] =
+    React.useState<Validate>('default');
+  const [nameHelperText, setNameHelperText] = React.useState<string>('');
+  const [descHelperText, setDescHelperText] = React.useState<string>('');
+
   const submitButton = useRef();
 
-  const validity = React.useMemo(() => {
+  const isNameValid = (name: string) => {
     if (name === undefined || name.trim() === '') {
       return 'empty-name' as const;
     } else if (!/^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(name.trim())) {
       return 'invalid-format' as const;
-    }
-    //validate max length
-    else if (name.length > MAX_SERVICE_ACCOUNT_NAME_LENGTH) {
+    } else if (name.length > MAX_SERVICE_ACCOUNT_NAME_LENGTH) {
       return 'invalid-length' as const;
-    }
-    return 'valid' as const;
-  }, [validate]);
-
-  const doValidate = (event: FocusEvent) => {
-    if (
-      !event.relatedTarget ||
-      (submitButton.current as unknown as Element).isEqualNode(
-        event.relatedTarget as Node
-      )
-    ) {
-      setValidate(true);
+    } else {
+      return 'valid' as const;
     }
   };
 
+  React.useEffect(() => {
+    const validationResult = isNameValid(name);
+    if (validationResult === 'valid') {
+      setNameValidated('success');
+      setNameHelperText(HELPER_TEXT['empty-name']);
+    } else if (name != '' || (name == '' && inputFieldBlur)) {
+      setNameValidated('error');
+      setNameHelperText(HELPER_TEXT[isNameValid(name)]);
+    }
+  }, [name, inputFieldBlur]);
+
+  const isDescriptionValid = (description: string) => {
+    if (description === undefined || description.trim() === '') {
+      return 'empty-desc' as const;
+    } else if (description.length > MAX_SERVICE_ACCOUNT_DESC_LENGTH) {
+      return 'invalid-desc-length' as const;
+    } else {
+      return 'valid' as const;
+    }
+  };
+
+  React.useEffect(() => {
+    const validationResult = isDescriptionValid(description);
+    if (validationResult === 'valid') {
+      setDescriptionValidated('success');
+      setDescHelperText('');
+    } else if (description != '' || (description == '' && inputFieldBlur)) {
+      setDescriptionValidated('error');
+      setDescHelperText(HELPER_TEXT[isDescriptionValid(description)]);
+    }
+  }, [description]);
+
+  const onBlurHandler = () => setInputFieldBlur(true);
+
   const handleSubmit: FormProps['onSubmit'] = (ev) => {
     ev.preventDefault();
-    setValidate(true);
-    if (validity === 'valid') {
-      onSubmit(name);
+    if (nameValidated === 'success' || descriptionValidated === 'success') {
+      onSubmit(name, description);
     }
   };
 
@@ -77,7 +109,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       variant={ModalVariant.medium}
       title={'Create a service account'}
       isOpen={true}
-      ouiaId={'modal-create-service-account'}
+      ouiaId="modal-create-service-account"
       appendTo={appendTo}
       showClose={false}
       actions={[
@@ -88,7 +120,9 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           form={FORM_ID}
           ref={submitButton}
           isLoading={isCreating}
-          isDisabled={isCreating}
+          isDisabled={
+            nameValidated != 'success' || descriptionValidated != 'success'
+          }
         >
           Create
         </Button>,
@@ -101,9 +135,15 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         </Button>,
       ]}
     >
-      <Form onSubmit={handleSubmit} id={FORM_ID} disabled={!validity}>
+      <Form
+        onSubmit={handleSubmit}
+        id={FORM_ID}
+        disabled={
+          nameValidated != 'success' || descriptionValidated != 'success'
+        }
+      >
         <FormGroup
-          label={'Service Account Name'}
+          label="Service Account Name"
           isRequired
           fieldId="name-field"
           labelIcon={
@@ -135,18 +175,36 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
             name="text-input-name"
             value={name}
             onChange={(_event, val) => setName(val)}
-            onBlur={doValidate}
-            validated={validate && validity !== 'valid' ? 'error' : undefined}
+            onBlur={onBlurHandler}
+            validated={nameValidated}
             autoFocus={true}
-            ouiaId={'text-input'}
+            ouiaId="text-input"
           />
           <FormHelperText>
             <HelperText>
-              <HelperTextItem>
-                {validity !== 'valid'
-                  ? HELPER_TEXT[validity]
-                  : HELPER_TEXT['invalid-format']}
-              </HelperTextItem>
+              <HelperTextItem>{nameHelperText}</HelperTextItem>
+            </HelperText>
+          </FormHelperText>
+        </FormGroup>
+        <FormGroup
+          label="Short description"
+          isRequired
+          fieldId="short-description-field"
+        >
+          <TextInput
+            isRequired
+            type="text"
+            id="text-input-description"
+            name="text-input-description"
+            value={description}
+            onChange={(_event, val) => setDescription(val)}
+            onBlur={onBlurHandler}
+            validated={descriptionValidated}
+            ouiaId="text-input-description"
+          />
+          <FormHelperText>
+            <HelperText>
+              <HelperTextItem>{descHelperText}</HelperTextItem>
             </HelperText>
           </FormHelperText>
         </FormGroup>

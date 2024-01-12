@@ -2,12 +2,14 @@ import { NewServiceAccount } from '../types';
 
 type Options = {
   name: string;
+  description: string;
   token: string;
   sso: string;
 };
 
 export async function createServiceAccount({
   name,
+  description,
   token,
   sso,
 }: Options): Promise<NewServiceAccount> {
@@ -18,7 +20,7 @@ export async function createServiceAccount({
         Authorization: `Bearer ${token}`,
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, description }),
       method: 'POST',
     }
   );

@@ -21,10 +21,15 @@ const CreateServiceAccountPage = () => {
       queryClient.invalidateQueries({ queryKey: ['service-accounts'] });
     },
   });
-  const onSubmit: CreateModalProps['onSubmit'] = async (name) => {
+  const onSubmit: CreateModalProps['onSubmit'] = async (name, description) => {
     const env = getEnvironmentDetails();
     const token = await auth.getToken();
-    mutation.mutate({ name, token: token as string, sso: env?.sso as string });
+    mutation.mutate({
+      name,
+      description,
+      token: token as string,
+      sso: env?.sso as string,
+    });
   };
 
   return mutation.data === undefined ? (
