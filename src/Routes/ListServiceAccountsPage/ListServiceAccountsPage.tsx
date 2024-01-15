@@ -1,4 +1,3 @@
-// import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { Main } from '@redhat-cloud-services/frontend-components/Main';
 import {
   PageHeader,
@@ -15,7 +14,6 @@ import {
 } from '../../shared/fetchServiceAccounts';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
-import { Alert } from '@patternfly/react-core';
 
 const ListServiceAccountsPage = () => {
   const { appAction } = useChrome();
