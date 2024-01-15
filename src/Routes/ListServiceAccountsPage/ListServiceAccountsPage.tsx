@@ -8,7 +8,11 @@ import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome'
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
-import { fetchServiceAccounts } from '../../shared/fetchServiceAccounts';
+import {
+  LAST_PAGE,
+  NO_DATA,
+  fetchServiceAccounts,
+} from '../../shared/fetchServiceAccounts';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 import { Alert } from '@patternfly/react-core';
@@ -65,12 +69,12 @@ const ListServiceAccountsPage = () => {
             />
           )}
           {(results.data || results.isLoading) &&
-          results.data?.state !== 'no-service-accounts' ? (
+          results.data?.state !== NO_DATA ? (
             <ServiceAccountsTable
               serviceAccounts={results.data?.serviceAccounts || []}
               page={page}
               perPage={perPage}
-              hasMore={results.data?.state !== 'last-page'}
+              hasMore={results.data?.state !== LAST_PAGE}
               isLoading={results.isLoading}
               onPaginationChange={(page, perPage) => {
                 setSearchParams({ page: `${page}`, perPage: `${perPage}` });
