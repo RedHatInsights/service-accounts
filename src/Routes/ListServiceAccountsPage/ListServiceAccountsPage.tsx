@@ -61,13 +61,6 @@ const ListServiceAccountsPage = () => {
       </PageHeader>
       <Main>
         <>
-          {results.data?.serviceAccounts?.length === 50 && (
-            <Alert
-              variant="warning"
-              isInline
-              title="Note: You cannot create more than 50 service accounts. To stay within the limit, consider reviewing and deactivating unused or obsolete service accounts."
-            />
-          )}
           {(results.data || results.isLoading) &&
           results.data?.state !== NO_DATA ? (
             <ServiceAccountsTable

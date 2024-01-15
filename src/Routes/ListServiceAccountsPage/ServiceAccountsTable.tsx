@@ -87,7 +87,6 @@ export const ServiceAccountsTable: FunctionComponent<{
                   Create service account
                 </AppLink>
               )}
-              isDisabled={serviceAccounts.length === 50}
             />
           </ToolbarItem>
           <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
