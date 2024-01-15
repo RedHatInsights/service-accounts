@@ -6,6 +6,8 @@ import {
   EmptyStateFooter,
   EmptyStateHeader,
   EmptyStateIcon,
+  Pagination,
+  PaginationVariant,
   Skeleton,
   Toolbar,
   ToolbarContent,
@@ -22,22 +24,58 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import React, { FC } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 
 import { ServiceAccount } from '../../types';
 
-export const ServiceAccountsTable: FC<{
+export const ServiceAccountsTable: FunctionComponent<{
   serviceAccounts: ServiceAccount[];
   page: number;
   perPage: number;
   hasMore: boolean;
   onPaginationChange: (page: number, perPage: number) => void;
   isLoading: boolean;
-}> = ({ serviceAccounts, perPage, onPaginationChange, isLoading }) => {
+}> = ({
+  serviceAccounts,
+  page,
+  perPage,
+  hasMore,
+  onPaginationChange,
+  isLoading,
+}) => {
   const navigate = useNavigate();
+
+  const itemCount = useMemo(
+    () =>
+      hasMore
+        ? undefined
+        : Math.max(page - 1, 0) * perPage + serviceAccounts.length,
+    [hasMore, page, perPage]
+  );
+
+  const toggleTemplate = ({
+    firstIndex,
+    lastIndex,
+  }: {
+    firstIndex?: number;
+    lastIndex?: number;
+  }) => (
+    <>
+      <b>
+        {firstIndex} - {lastIndex}
+      </b>{' '}
+      of{' '}
+      <b>
+        {hasMore
+          ? 'many'
+          : Math.max(page - 1, 0) * perPage + serviceAccounts.length}
+      </b>
+    </>
+  );
+
   return (
     <>
       <Toolbar id="toolbar-items">
@@ -49,7 +87,20 @@ export const ServiceAccountsTable: FC<{
                   Create service account
                 </AppLink>
               )}
-              isDisabled={serviceAccounts.length === 50}
+            />
+          </ToolbarItem>
+          <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
+            <Pagination
+              widgetId="top-sa-pagination"
+              itemCount={itemCount}
+              perPage={perPage}
+              page={page}
+              onSetPage={(e, newPage) => onPaginationChange(newPage, perPage)}
+              onPerPageSelect={(e, newPerPage) =>
+                onPaginationChange(1, newPerPage)
+              }
+              toggleTemplate={toggleTemplate}
+              isCompact
             />
           </ToolbarItem>
         </ToolbarContent>
@@ -69,16 +120,16 @@ export const ServiceAccountsTable: FC<{
           {isLoading &&
             new Array(perPage).fill(0).map((_, idx) => (
               <Tr key={idx}>
-                <Td dataLabel={'Name'}>
+                <Td dataLabel="Name">
                   <Skeleton screenreaderText={'Loading service accounts'} />
                 </Td>
-                <Td dataLabel={'Client ID'}>
+                <Td dataLabel="Client ID">
                   <Skeleton />
                 </Td>
-                <Td dataLabel={'Owner'}>
+                <Td dataLabel="Owner">
                   <Skeleton />
                 </Td>
-                <Td dataLabel={'Time created'}>
+                <Td dataLabel="Time created">
                   <Skeleton />
                 </Td>
                 <Td isActionCell={true}>
@@ -90,10 +141,10 @@ export const ServiceAccountsTable: FC<{
             serviceAccounts.length > 0 &&
             serviceAccounts.map((sa) => (
               <Tr key={sa.id}>
-                <Td dataLabel={'Name'}>{sa.name}</Td>
-                <Td dataLabel={'Client ID'}>{sa.clientId}</Td>
-                <Td dataLabel={'Owner'}>{sa.createdBy}</Td>
-                <Td dataLabel={'Time created'}>
+                <Td dataLabel="Name">{sa.name}</Td>
+                <Td dataLabel="Client ID">{sa.clientId}</Td>
+                <Td dataLabel="Owner">{sa.createdBy}</Td>
+                <Td dataLabel="Time created">
                   <DateFormat date={sa.createdAt * 1000} />
                 </Td>
                 <Td isActionCell={true}>
@@ -141,6 +192,17 @@ export const ServiceAccountsTable: FC<{
           )}
         </Tbody>
       </Table>
+      <Pagination
+        widgetId="bottom-sa-pagination"
+        itemCount={itemCount}
+        perPage={perPage}
+        page={page}
+        variant={PaginationVariant.bottom}
+        onSetPage={(e, newPage) => onPaginationChange(newPage, perPage)}
+        onPerPageSelect={(e, newPerPage) => onPaginationChange(1, newPerPage)}
+        toggleTemplate={toggleTemplate}
+        isCompact
+      />
     </>
   );
 };
