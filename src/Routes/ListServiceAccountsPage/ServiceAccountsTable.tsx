@@ -56,25 +56,17 @@ export const ServiceAccountsTable: FunctionComponent<{
     [hasMore, page, perPage]
   );
 
-  const toggleTemplate = ({
-    firstIndex,
-    lastIndex,
-  }: {
-    firstIndex?: number;
-    lastIndex?: number;
-  }) => (
-    <>
-      <b>
-        {firstIndex} - {lastIndex}
-      </b>{' '}
-      of{' '}
-      <b>
-        {hasMore
-          ? 'many'
-          : Math.max(page - 1, 0) * perPage + serviceAccounts.length}
-      </b>
-    </>
-  );
+  const toggleTemplate = ({ firstIndex }: { firstIndex?: number }) => {
+    const count = Math.max(page - 1, 0) * perPage + serviceAccounts.length;
+    return (
+      <>
+        <b>
+          {firstIndex} - {count}
+        </b>{' '}
+        of <b>{hasMore ? 'many' : count}</b>
+      </>
+    );
+  };
 
   return (
     <>
