@@ -15,4 +15,6 @@ export type ServiceAccount = {
 
 export type NewServiceAccount = {
   secret: string;
+  error?: string;
+  error_description?: string;
 } & ServiceAccount;
