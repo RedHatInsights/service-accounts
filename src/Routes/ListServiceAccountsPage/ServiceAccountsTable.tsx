@@ -24,12 +24,13 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import React, { FunctionComponent, useMemo } from 'react';
+import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 
 import { ServiceAccount } from '../../types';
+import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 
 export const ServiceAccountsTable: FunctionComponent<{
   serviceAccounts: ServiceAccount[];
@@ -46,7 +47,16 @@ export const ServiceAccountsTable: FunctionComponent<{
   onPaginationChange,
   isLoading,
 }) => {
+  const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | undefined>();
   const navigate = useNavigate();
+  const { auth } = useChrome();
+
+  useEffect(() => {
+    const getUser = () => auth.getUser();
+    getUser().then((data) => {
+      setIsOrgAdmin(data?.identity?.user?.is_org_admin);
+    });
+  }, []);
 
   const itemCount = useMemo(
     () =>
@@ -144,11 +154,13 @@ export const ServiceAccountsTable: FunctionComponent<{
                     items={[
                       {
                         title: 'Reset credentials',
+                        isDisabled: !isOrgAdmin,
                         onClick: () =>
                           navigate(mergeToBasename(`reset/${sa.id}`)),
                       },
                       {
                         title: 'Delete service account',
+                        isDisabled: !isOrgAdmin,
                         onClick: () =>
                           navigate(mergeToBasename(`delete/${sa.id}`)),
                       },
