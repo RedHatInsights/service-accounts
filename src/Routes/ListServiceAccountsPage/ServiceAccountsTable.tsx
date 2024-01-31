@@ -112,6 +112,7 @@ export const ServiceAccountsTable: FunctionComponent<{
         <Thead>
           <Tr>
             <Th>Name</Th>
+            <Th>Description</Th>
             <Th>Client ID</Th>
             <Th>Owner</Th>
             <Th>Time created</Th>
@@ -124,6 +125,9 @@ export const ServiceAccountsTable: FunctionComponent<{
               <Tr key={idx}>
                 <Td dataLabel="Name">
                   <Skeleton screenreaderText={'Loading service accounts'} />
+                </Td>
+                <Td dataLabel="Description">
+                  <Skeleton />
                 </Td>
                 <Td dataLabel="Client ID">
                   <Skeleton />
@@ -144,6 +148,7 @@ export const ServiceAccountsTable: FunctionComponent<{
             serviceAccounts.map((sa) => (
               <Tr key={sa.id}>
                 <Td dataLabel="Name">{sa.name}</Td>
+                <Td dataLabel="Description">{sa.description}</Td>
                 <Td dataLabel="Client ID">{sa.clientId}</Td>
                 <Td dataLabel="Owner">{sa.createdBy}</Td>
                 <Td dataLabel="Time created">
