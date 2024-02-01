@@ -11,6 +11,7 @@ export type ServiceAccount = {
   createdAt: number;
   createdBy: string;
   name: string;
+  description: string;
 };
 
 export type NewServiceAccount = {
