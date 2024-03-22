@@ -12,7 +12,7 @@ export async function resetServiceAccount({
   sso,
 }: Options): Promise<NewServiceAccount> {
   const response = await fetch(
-    `${sso}/realms/redhat-external/apis/service_accounts/v1/${clientId}/resetSecret
+    `${sso}realms/redhat-external/apis/service_accounts/v1/${clientId}/resetSecret
 `,
     {
       headers: {

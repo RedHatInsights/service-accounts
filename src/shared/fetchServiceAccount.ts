@@ -12,7 +12,7 @@ export async function fetchServiceAccount({
   sso,
 }: Options): Promise<ServiceAccount> {
   const response = await fetch(
-    `${sso}/realms/redhat-external/apis/service_accounts/v1/${clientId}`,
+    `${sso}realms/redhat-external/apis/service_accounts/v1/${clientId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
