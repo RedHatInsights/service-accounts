@@ -6,7 +6,7 @@ type Options = {
 
 export async function deleteServiceAccount({ clientId, token, sso }: Options) {
   return fetch(
-    `${sso}/realms/redhat-external/apis/service_accounts/v1/${clientId}`,
+    `${sso}realms/redhat-external/apis/service_accounts/v1/${clientId}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

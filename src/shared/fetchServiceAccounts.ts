@@ -23,7 +23,7 @@ export async function fetchServiceAccounts({
   const first = (page - 1) * perPage;
   const max = Math.min(perPage + 1, 100);
   const response = await fetch(
-    `${sso}/realms/redhat-external/apis/service_accounts/v1?first=${first}&max=${max}`,
+    `${sso}realms/redhat-external/apis/service_accounts/v1?first=${first}&max=${max}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

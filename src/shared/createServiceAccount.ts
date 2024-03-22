@@ -14,7 +14,7 @@ export async function createServiceAccount({
   sso,
 }: Options): Promise<NewServiceAccount> {
   const response = await fetch(
-    `${sso}/realms/redhat-external/apis/service_accounts/v1`,
+    `${sso}realms/redhat-external/apis/service_accounts/v1`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
