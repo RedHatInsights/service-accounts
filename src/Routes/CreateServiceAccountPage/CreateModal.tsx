@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonVariant,
   Form,
   FormGroup,
   FormHelperText,
@@ -67,7 +68,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
     if (validationResult === 'valid') {
       setNameValidated('success');
       setNameHelperText(HELPER_TEXT['empty-name']);
-    } else if (name != '' || (name == '' && inputFieldBlur)) {
+    } else if (name !== '' || (name === '' && inputFieldBlur)) {
       setNameValidated('error');
       setNameHelperText(HELPER_TEXT[isNameValid(name)]);
     }
@@ -107,7 +108,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
     <Modal
       id="modalCreateServiceAccountStep1"
       variant={ModalVariant.medium}
-      title={'Create a service account'}
+      title="Create a service account"
       isOpen={true}
       ouiaId="modal-create-service-account"
       appendTo={appendTo}
@@ -115,21 +116,21 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       actions={[
         <Button
           key="create"
-          variant="primary"
-          type={'submit'}
+          variant={ButtonVariant.primary}
+          type="submit"
           form={FORM_ID}
           ref={submitButton}
           isLoading={isCreating}
           isDisabled={
-            nameValidated != 'success' || descriptionValidated != 'success'
+            nameValidated !== 'success' || descriptionValidated !== 'success'
           }
         >
           Create
         </Button>,
         <Button
           key="cancel"
-          variant="link"
-          component={(props) => <AppLink {...props} to={''} />}
+          variant={ButtonVariant.link}
+          component={(props) => <AppLink {...props} to="" />}
         >
           Cancel
         </Button>,
@@ -143,24 +144,19 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         }
       >
         <FormGroup
-          label="Service Account Name"
           isRequired
+          label="Service account name"
           fieldId="name-field"
           labelIcon={
             <Popover
-              headerContent={<div>Service Account Name</div>}
-              bodyContent={
-                <div>
-                  Please provide a simple and short name of the service account
-                  you are creating
-                </div>
-              }
+              headerContent="Service account name"
+              bodyContent="Please provide a simple and short name of the service account you are creating"
             >
               <button
                 aria-label="name of service account"
                 aria-describedby="name-field"
                 className="pf-c-form__group-label-help"
-                type={'button'}
+                type="button"
                 onClick={(e) => e.preventDefault()}
               >
                 <HelpIcon />
@@ -187,8 +183,8 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           </FormHelperText>
         </FormGroup>
         <FormGroup
-          label="Short description"
           isRequired
+          label="Short description"
           fieldId="short-description-field"
         >
           <TextInput
