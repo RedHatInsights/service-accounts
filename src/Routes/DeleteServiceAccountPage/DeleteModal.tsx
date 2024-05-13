@@ -7,8 +7,8 @@ import {
   TextContent,
 } from '@patternfly/react-core';
 import React, { VoidFunctionComponent } from 'react';
-import { AppLink } from '../../shared/AppLink';
-import { appendTo } from '../../shared/utils';
+import { appendTo, mergeToBasename } from '../../shared/utils';
+import { useNavigate } from 'react-router-dom';
 
 export type DeleteModalProps = {
   name: string | undefined;
@@ -21,6 +21,10 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
   isDeleting,
   onConfirm,
 }) => {
+  const navigate = useNavigate();
+
+  const onClose = () => navigate(mergeToBasename(''));
+
   return (
     <Modal
       id="modalCreateServiceAccountReset"
@@ -30,7 +34,7 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
       isOpen={true}
       ouiaId={'modal-reset-service-account'}
       appendTo={appendTo}
-      showClose={false}
+      onClose={onClose}
       actions={[
         <Button
           key="create"
@@ -41,11 +45,7 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
         >
           Delete
         </Button>,
-        <Button
-          key="cancel"
-          variant="link"
-          component={(props) => <AppLink {...props} to={''} />}
-        >
+        <Button key="cancel" variant="link" onClick={onClose}>
           Cancel
         </Button>,
       ]}

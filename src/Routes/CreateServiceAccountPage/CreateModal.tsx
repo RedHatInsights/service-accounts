@@ -14,15 +14,14 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 import React, { VoidFunctionComponent, useRef, useState } from 'react';
-import { AppLink } from '../../shared/AppLink';
-import { appendTo } from '../../shared/utils';
+import { appendTo, mergeToBasename } from '../../shared/utils';
+import { useNavigate } from 'react-router-dom';
 
 const FORM_ID = 'service-account-form';
 const MAX_SERVICE_ACCOUNT_NAME_LENGTH = 32;
 const MAX_SERVICE_ACCOUNT_DESC_LENGTH = 255;
 const HELPER_TEXT: { [key: string]: string } = {
-  'empty-name':
-    'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
+  'empty-name': '',
   'empty-desc': 'Please provide a short description',
   'invalid-format':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
@@ -49,6 +48,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   const [nameHelperText, setNameHelperText] = React.useState<string>('');
   const [descHelperText, setDescHelperText] = React.useState<string>('');
 
+  const navigate = useNavigate();
   const submitButton = useRef();
 
   const isNameValid = (name: string) => {
@@ -96,6 +96,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
   }, [description]);
 
   const onBlurHandler = () => setInputFieldBlur(true);
+  const onClose = () => navigate(mergeToBasename(''));
 
   const handleSubmit: FormProps['onSubmit'] = (ev) => {
     ev.preventDefault();
@@ -110,9 +111,9 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       variant={ModalVariant.medium}
       title="Create a service account"
       isOpen={true}
+      onClose={onClose}
       ouiaId="modal-create-service-account"
       appendTo={appendTo}
-      showClose={false}
       actions={[
         <Button
           key="create"
@@ -127,11 +128,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         >
           Create
         </Button>,
-        <Button
-          key="cancel"
-          variant={ButtonVariant.link}
-          component={(props) => <AppLink {...props} to="" />}
-        >
+        <Button key="cancel" variant={ButtonVariant.link} onClick={onClose}>
           Cancel
         </Button>,
       ]}
