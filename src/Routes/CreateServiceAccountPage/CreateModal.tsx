@@ -21,8 +21,8 @@ const FORM_ID = 'service-account-form';
 const MAX_SERVICE_ACCOUNT_NAME_LENGTH = 32;
 const MAX_SERVICE_ACCOUNT_DESC_LENGTH = 255;
 const HELPER_TEXT: { [key: string]: string } = {
-  'empty-name': '',
-  'empty-desc': 'Please provide a short description',
+  'empty-name': 'Required',
+  'empty-desc': 'Required',
   'invalid-format':
     'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
   'invalid-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_NAME_LENGTH} characters.`,
@@ -175,7 +175,9 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           />
           <FormHelperText>
             <HelperText>
-              <HelperTextItem>{nameHelperText}</HelperTextItem>
+              <HelperTextItem variant={nameValidated}>
+                {nameHelperText}
+              </HelperTextItem>
             </HelperText>
           </FormHelperText>
         </FormGroup>
@@ -197,7 +199,9 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           />
           <FormHelperText>
             <HelperText>
-              <HelperTextItem>{descHelperText}</HelperTextItem>
+              <HelperTextItem variant={descriptionValidated}>
+                {descHelperText}
+              </HelperTextItem>
             </HelperText>
           </FormHelperText>
         </FormGroup>
