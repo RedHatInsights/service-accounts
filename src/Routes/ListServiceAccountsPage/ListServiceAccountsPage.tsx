@@ -3,6 +3,8 @@ import {
   PageHeader,
   PageHeaderTitle,
 } from '@redhat-cloud-services/frontend-components/PageHeader';
+import { Icon, Text, TextContent } from '@patternfly/react-core';
+import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
@@ -51,11 +53,23 @@ const ListServiceAccountsPage = () => {
     <>
       <PageHeader>
         <PageHeaderTitle title="Service Accounts" />
-        <p>
-          Use service accounts to securely and automatically connect and
-          authenticate services or applications without requiring an end
-          user&#39;s credentials or direct interaction.
-        </p>
+        <TextContent>
+          <Text component="p" className="pf-v5-u-pt-sm">
+            Use service accounts to securely and automatically connect and
+            authenticate services or applications without requiring an end
+            user&#39;s credentials or direct interaction.
+          </Text>
+          <Text
+            component="a"
+            href="https://youtu.be/UvNcmJsbg1w"
+            target="_blank"
+          >
+            Watch a video to learn more
+            <Icon className="pf-v5-u-ml-sm" size="md" isInline>
+              <ExternalLinkAltIcon />
+            </Icon>
+          </Text>
+        </TextContent>
       </PageHeader>
       <Main>
         <>
