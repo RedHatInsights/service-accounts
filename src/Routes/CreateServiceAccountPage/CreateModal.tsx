@@ -129,7 +129,12 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         >
           Create
         </Button>,
-        <Button ouiaId="createmodal-cancel-button" key="cancel" variant={ButtonVariant.link} onClick={onClose}>
+        <Button
+          ouiaId="createmodal-cancel-button"
+          key="cancel"
+          variant={ButtonVariant.link}
+          onClick={onClose}
+        >
           Cancel
         </Button>,
       ]}

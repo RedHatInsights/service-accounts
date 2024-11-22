@@ -110,7 +110,10 @@ export const ServiceAccountsTable: FunctionComponent<{
         </ToolbarContent>
       </Toolbar>
 
-      <Table aria-label="List of created service accounts" ouiaId="service-accounts-table">
+      <Table
+        aria-label="List of created service accounts"
+        ouiaId="service-accounts-table"
+      >
         <Thead>
           <Tr>
             <Th>Name</Th>

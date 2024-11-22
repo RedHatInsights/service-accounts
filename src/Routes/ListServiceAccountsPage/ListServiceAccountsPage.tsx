@@ -52,7 +52,10 @@ const ListServiceAccountsPage = () => {
   return (
     <>
       <PageHeader>
-        <PageHeaderTitle ouiaId="service-accounts-page-title" title="Service Accounts" />
+        <PageHeaderTitle
+          ouiaId="service-accounts-page-title"
+          title="Service Accounts"
+        />
         <TextContent>
           <Text component="p" className="pf-v5-u-pt-sm">
             Use service accounts to securely and automatically connect and
