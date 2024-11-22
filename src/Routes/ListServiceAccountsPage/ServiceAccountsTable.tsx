@@ -84,6 +84,7 @@ export const ServiceAccountsTable: FunctionComponent<{
         <ToolbarContent>
           <ToolbarItem>
             <Button
+              ouiaId="service-accounts-table-create-button"
               component={(props) => (
                 <AppLink {...props} to="create">
                   Create service account
@@ -93,6 +94,7 @@ export const ServiceAccountsTable: FunctionComponent<{
           </ToolbarItem>
           <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
             <Pagination
+              ouiaId="service-accounts-table-top-pagination"
               widgetId="top-sa-pagination"
               itemCount={itemCount}
               perPage={perPage}
@@ -108,7 +110,10 @@ export const ServiceAccountsTable: FunctionComponent<{
         </ToolbarContent>
       </Toolbar>
 
-      <Table aria-label="List of created service accounts">
+      <Table
+        aria-label="List of created service accounts"
+        ouiaId="service-accounts-table"
+      >
         <Thead>
           <Tr>
             <Th>Name</Th>
@@ -160,12 +165,14 @@ export const ServiceAccountsTable: FunctionComponent<{
                       {
                         title: 'Reset credentials',
                         isDisabled: !isOrgAdmin,
+                        ouiaId: 'reset-credentials-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`reset/${sa.id}`)),
                       },
                       {
                         title: 'Delete service account',
                         isDisabled: !isOrgAdmin,
+                        ouiaId: 'delete-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`delete/${sa.id}`)),
                       },
@@ -189,6 +196,7 @@ export const ServiceAccountsTable: FunctionComponent<{
                 <EmptyStateFooter>
                   <EmptyStateActions>
                     <Button
+                      ouiaId="service-accounts-table-emptystate-clear-filters-button"
                       variant="link"
                       onClick={() => onPaginationChange(1, perPage)}
                     >
@@ -202,6 +210,7 @@ export const ServiceAccountsTable: FunctionComponent<{
         </Tbody>
       </Table>
       <Pagination
+        ouiaId="service-accounts-table-bottom-pagination"
         widgetId="bottom-sa-pagination"
         itemCount={itemCount}
         perPage={perPage}

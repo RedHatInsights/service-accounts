@@ -116,6 +116,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       appendTo={appendTo}
       actions={[
         <Button
+          ouiaId="createmodal-create-button"
           key="create"
           variant={ButtonVariant.primary}
           type="submit"
@@ -128,7 +129,12 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
         >
           Create
         </Button>,
-        <Button key="cancel" variant={ButtonVariant.link} onClick={onClose}>
+        <Button
+          ouiaId="createmodal-cancel-button"
+          key="cancel"
+          variant={ButtonVariant.link}
+          onClick={onClose}
+        >
           Cancel
         </Button>,
       ]}
@@ -171,7 +177,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
             onBlur={onBlurHandler}
             validated={nameValidated}
             autoFocus={true}
-            ouiaId="text-input"
+            ouiaId="createmodal-text-input-name"
           />
           <FormHelperText>
             <HelperText>
