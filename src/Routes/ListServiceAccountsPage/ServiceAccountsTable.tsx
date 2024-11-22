@@ -162,12 +162,14 @@ export const ServiceAccountsTable: FunctionComponent<{
                       {
                         title: 'Reset credentials',
                         isDisabled: !isOrgAdmin,
+                        ouiaId: 'reset-credentials-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`reset/${sa.id}`)),
                       },
                       {
                         title: 'Delete service account',
                         isDisabled: !isOrgAdmin,
+                        ouiaId: 'delete-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`delete/${sa.id}`)),
                       },
@@ -180,12 +182,11 @@ export const ServiceAccountsTable: FunctionComponent<{
             <Td colSpan={5}>
               <EmptyState>
                 <EmptyStateHeader
-                  ouiaId="service-accounts-table-emptystate-header"
                   titleText="No results found"
                   icon={<EmptyStateIcon icon={SearchIcon} />}
                   headingLevel="h4"
                 />
-                <EmptyStateBody ouiaId="service-accounts-table-emptystate-body">
+                <EmptyStateBody>
                   No results match the filter criteria. Clear all filters and
                   try again.
                 </EmptyStateBody>
