@@ -1,6 +1,8 @@
 const pkg = require('./package.json');
+const path = require('path');
 
 module.exports = {
+  frontendCRDPath: path.resolve(__dirname, './deploy/frontend.yml'),
   appUrl: pkg.insights.appUrl,
   debug: true,
   useProxy: true,
