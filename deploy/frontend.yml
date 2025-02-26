@@ -43,11 +43,6 @@ objects:
           - id: service-accounts
             title: Service Accounts
             href: /iam/service-accounts
-            permissions:
-            - method: featureFlag
-              args:
-              - platform.iam.service-accounts
-              - true
       module:
         manifestLocation: "/apps/service-accounts/fed-mods.json"
         modules:
