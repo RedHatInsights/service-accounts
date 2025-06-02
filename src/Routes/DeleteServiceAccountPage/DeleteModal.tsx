@@ -1,10 +1,13 @@
 import {
   Bullseye,
   Button,
+  Content,
   Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   ModalVariant,
   Spinner,
-  TextContent,
 } from '@patternfly/react-core';
 import React, { VoidFunctionComponent } from 'react';
 import { appendTo, mergeToBasename } from '../../shared/utils';
@@ -29,13 +32,27 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
     <Modal
       id="modalCreateServiceAccountReset"
       variant={ModalVariant.medium}
-      title={'Delete service account?'}
-      titleIconVariant={'warning'}
       isOpen={true}
       ouiaId={'modal-reset-service-account'}
       appendTo={appendTo}
       onClose={onClose}
-      actions={[
+    >
+      <ModalHeader titleIconVariant="warning" title="Delete service account?" />
+      <ModalBody>
+        {name ? (
+          <Content>
+            <strong>{name}</strong> will be deleted.
+          </Content>
+        ) : (
+          <Bullseye>
+            <Spinner
+              aria-label={'Loading service account information'}
+              size={'xl'}
+            />
+          </Bullseye>
+        )}
+      </ModalBody>
+      <ModalFooter>
         <Button
           key="create"
           variant="danger"
@@ -44,24 +61,11 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
           onClick={onConfirm}
         >
           Delete
-        </Button>,
+        </Button>
         <Button key="cancel" variant="link" onClick={onClose}>
           Cancel
-        </Button>,
-      ]}
-    >
-      {name ? (
-        <TextContent>
-          <strong>{name}</strong> will be deleted.
-        </TextContent>
-      ) : (
-        <Bullseye>
-          <Spinner
-            aria-label={'Loading service account information'}
-            size={'xl'}
-          />
-        </Bullseye>
-      )}
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 };

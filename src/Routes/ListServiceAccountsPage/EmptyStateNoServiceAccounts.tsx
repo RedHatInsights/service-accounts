@@ -3,8 +3,6 @@ import {
   EmptyState,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
@@ -14,12 +12,12 @@ import { AppLink } from '../../shared/AppLink';
 
 export const EmptyStateNoServiceAccounts: VoidFunctionComponent = () => {
   return (
-    <EmptyState variant={EmptyStateVariant.xs}>
-      <EmptyStateHeader
-        titleText="No service accounts yet"
-        icon={<EmptyStateIcon icon={PlusCircleIcon} />}
-        headingLevel="h2"
-      />
+    <EmptyState
+      headingLevel="h2"
+      icon={PlusCircleIcon}
+      titleText="No service accounts yet"
+      variant={EmptyStateVariant.xs}
+    >
       <EmptyStateBody>To get started, create a service account.</EmptyStateBody>
       <EmptyStateFooter>
         <Button

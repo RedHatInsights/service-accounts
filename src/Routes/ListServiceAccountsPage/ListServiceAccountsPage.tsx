@@ -3,7 +3,7 @@ import {
   PageHeader,
   PageHeaderTitle,
 } from '@redhat-cloud-services/frontend-components/PageHeader';
-import { Icon, Text, TextContent } from '@patternfly/react-core';
+import { Content, Icon } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -56,23 +56,23 @@ const ListServiceAccountsPage = () => {
           ouiaId="service-accounts-page-title"
           title="Service Accounts"
         />
-        <TextContent>
-          <Text component="p" className="pf-v5-u-pt-sm">
+        <Content>
+          <Content component="p" className="pf-v6-u-pt-sm">
             Use service accounts to securely and automatically connect and
             authenticate services or applications without requiring an end
             user&#39;s credentials or direct interaction.
-          </Text>
-          <Text
+          </Content>
+          <Content
             component="a"
             href="https://youtu.be/UvNcmJsbg1w"
             target="_blank"
           >
             Watch a video to learn more
-            <Icon className="pf-v5-u-ml-sm" size="md" isInline>
+            <Icon className="pf-v6-u-ml-sm" size="md" isInline>
               <ExternalLinkAltIcon />
             </Icon>
-          </Text>
-        </TextContent>
+          </Content>
+        </Content>
       </PageHeader>
       <Main>
         <>
