@@ -1,8 +1,7 @@
-import { addNotification } from '@redhat-cloud-services/frontend-components-notifications/redux';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
+import { useAddNotification } from '@redhat-cloud-services/frontend-components-notifications/hooks/useNotifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteServiceAccount } from '../../shared/deleteServiceAccount';
 import { fetchServiceAccount } from '../../shared/fetchServiceAccount';
@@ -12,12 +11,12 @@ import { DeleteModal, DeleteModalProps } from './DeleteModal';
 const DeleteServiceAccountPage = () => {
   const { clientId } = useParams<{ clientId: string }>();
   const { appAction } = useChrome();
+  const addNotification = useAddNotification();
 
   const { auth, getEnvironmentDetails } = useChrome();
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
 
   const query = useQuery({
     queryKey: ['service-account', clientId],
@@ -43,12 +42,11 @@ const DeleteServiceAccountPage = () => {
         queryKey: ['service-accounts'],
       });
       navigate(mergeToBasename(''));
-      dispatch(
-        addNotification({
-          variant: 'success',
-          title: `${query.data?.name} service account deleted`,
-        })
-      );
+
+      addNotification({
+        variant: 'success',
+        title: `${query.data?.name} service account deleted`,
+      });
     },
   });
 

@@ -4,8 +4,6 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateHeader,
-  EmptyStateIcon,
   Pagination,
   PaginationVariant,
   Skeleton,
@@ -92,7 +90,7 @@ export const ServiceAccountsTable: FunctionComponent<{
               )}
             />
           </ToolbarItem>
-          <ToolbarItem variant="pagination" align={{ default: 'alignRight' }}>
+          <ToolbarItem variant="pagination" align={{ default: 'alignEnd' }}>
             <Pagination
               ouiaId="service-accounts-table-top-pagination"
               widgetId="top-sa-pagination"
@@ -183,12 +181,11 @@ export const ServiceAccountsTable: FunctionComponent<{
             ))}
           {!isLoading && serviceAccounts.length === 0 && (
             <Td colSpan={5}>
-              <EmptyState>
-                <EmptyStateHeader
-                  titleText="No results found"
-                  icon={<EmptyStateIcon icon={SearchIcon} />}
-                  headingLevel="h4"
-                />
+              <EmptyState
+                headingLevel="h4"
+                icon={SearchIcon}
+                titleText="No results found"
+              >
                 <EmptyStateBody>
                   No results match the filter criteria. Clear all filters and
                   try again.
