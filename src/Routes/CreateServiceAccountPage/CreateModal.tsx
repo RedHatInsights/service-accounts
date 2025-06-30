@@ -7,7 +7,11 @@ import {
   FormProps,
   HelperText,
   HelperTextItem,
+  Icon,
   Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
   ModalVariant,
   Popover,
   TextInput,
@@ -114,30 +118,6 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       onClose={onClose}
       ouiaId="modal-create-service-account"
       appendTo={appendTo}
-      actions={[
-        <Button
-          ouiaId="createmodal-create-button"
-          key="create"
-          variant={ButtonVariant.primary}
-          type="submit"
-          form={FORM_ID}
-          ref={submitButton}
-          isLoading={isCreating}
-          isDisabled={
-            nameValidated !== 'success' || descriptionValidated !== 'success'
-          }
-        >
-          Create
-        </Button>,
-        <Button
-          ouiaId="createmodal-cancel-button"
-          key="cancel"
-          variant={ButtonVariant.link}
-          onClick={onClose}
-        >
-          Cancel
-        </Button>,
-      ]}
     >
       <Form
         onSubmit={handleSubmit}
@@ -146,71 +126,99 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           nameValidated != 'success' || descriptionValidated != 'success'
         }
       >
-        <FormGroup
-          isRequired
-          label="Service account name"
-          fieldId="name-field"
-          labelIcon={
-            <Popover
-              headerContent="Service account name"
-              bodyContent="Please provide a simple and short name of the service account you are creating"
-            >
-              <button
-                aria-label="name of service account"
-                aria-describedby="name-field"
-                className="pf-c-form__group-label-help"
-                type="button"
-                onClick={(e) => e.preventDefault()}
+        <ModalHeader title="Create a service account" />
+        <ModalBody>
+          <FormGroup
+            isRequired
+            label="Service account name"
+            fieldId="name-field"
+            labelHelp={
+              <Popover
+                headerContent="Service account name"
+                bodyContent="Please provide a simple and short name of the service account you are creating"
               >
-                <HelpIcon />
-              </button>
-            </Popover>
-          }
-        >
-          <TextInput
+                <Button
+                  aria-label="name of service account"
+                  aria-describedby="name-field"
+                  className="pf-c-form__group-label-help"
+                  type="button"
+                  onClick={(e) => e.preventDefault()}
+                  variant="plain"
+                >
+                  <Icon>
+                    <HelpIcon />
+                  </Icon>
+                </Button>
+              </Popover>
+            }
+          >
+            <TextInput
+              isRequired
+              type="text"
+              id="text-input-name"
+              name="text-input-name"
+              value={name}
+              onChange={(_event, val) => setName(val)}
+              onBlur={onBlurHandler}
+              validated={nameValidated}
+              autoFocus={true}
+              ouiaId="createmodal-text-input-name"
+            />
+            <FormHelperText>
+              <HelperText>
+                <HelperTextItem variant={nameValidated}>
+                  {nameHelperText}
+                </HelperTextItem>
+              </HelperText>
+            </FormHelperText>
+          </FormGroup>
+          <FormGroup
             isRequired
-            type="text"
-            id="text-input-name"
-            name="text-input-name"
-            value={name}
-            onChange={(_event, val) => setName(val)}
-            onBlur={onBlurHandler}
-            validated={nameValidated}
-            autoFocus={true}
-            ouiaId="createmodal-text-input-name"
-          />
-          <FormHelperText>
-            <HelperText>
-              <HelperTextItem variant={nameValidated}>
-                {nameHelperText}
-              </HelperTextItem>
-            </HelperText>
-          </FormHelperText>
-        </FormGroup>
-        <FormGroup
-          isRequired
-          label="Short description"
-          fieldId="short-description-field"
-        >
-          <TextInput
-            isRequired
-            type="text"
-            id="text-input-description"
-            name="text-input-description"
-            value={description}
-            onChange={(_event, val) => setDescription(val)}
-            onBlur={onBlurHandler}
-            validated={descriptionValidated}
-            ouiaId="text-input-description"
-          />
-          <FormHelperText>
-            <HelperText>
-              <HelperTextItem variant={descriptionValidated}>
-                {descHelperText}
-              </HelperTextItem>
-            </HelperText>
-          </FormHelperText>
-        </FormGroup>
+            label="Short description"
+            fieldId="short-description-field"
+          >
+            <TextInput
+              isRequired
+              type="text"
+              id="text-input-description"
+              name="text-input-description"
+              value={description}
+              onChange={(_event, val) => setDescription(val)}
+              onBlur={onBlurHandler}
+              validated={descriptionValidated}
+              ouiaId="text-input-description"
+            />
+            <FormHelperText>
+              <HelperText>
+                <HelperTextItem variant={descriptionValidated}>
+                  {descHelperText}
+                </HelperTextItem>
+              </HelperText>
+            </FormHelperText>
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            ouiaId="createmodal-create-button"
+            variant={ButtonVariant.primary}
+            type="submit"
+            form={FORM_ID}
+            ref={submitButton}
+            isLoading={isCreating}
+            isDisabled={
+              nameValidated !== 'success' || descriptionValidated !== 'success'
+            }
+          >
+            Create
+          </Button>
+          <Button
+            ouiaId="createmodal-cancel-button"
+            variant={ButtonVariant.link}
+            onClick={onClose}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
       </Form>
     </Modal>
   );
