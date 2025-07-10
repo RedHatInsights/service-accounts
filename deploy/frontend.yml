@@ -45,6 +45,10 @@ objects:
             href: /iam/service-accounts
       module:
         manifestLocation: "/apps/service-accounts/fed-mods.json"
+        config:
+          ssoScopes:
+            - api.console
+            - api.iam.service_accounts
         modules:
         - id: service-accounts
           module: "./RootApp"
