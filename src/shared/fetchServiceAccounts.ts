@@ -21,9 +21,20 @@ export async function fetchServiceAccounts({
   state: string;
 }> {
   const first = (page - 1) * perPage;
-  const max = Math.min(perPage + 1, 100);
   const response = await fetch(
-    `${sso}realms/redhat-external/apis/service_accounts/v1?first=${first}&max=${max}`,
+    `${sso}realms/redhat-external/apis/service_accounts/v1?first=${first}&max=${
+      perPage - 1
+    }`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const hasNextPageResponse = await fetch(
+    `${sso}realms/redhat-external/apis/service_accounts/v1?first=${
+      page * perPage - 1
+    }&max=${2}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -31,16 +42,22 @@ export async function fetchServiceAccounts({
     }
   );
   const data = await response.json();
+  const hasNextPageData = await hasNextPageResponse.json();
 
   let state;
   if (page === 1 && data.length === 0) {
     state = NO_DATA;
   } else {
-    state = data.length < perPage + 1 ? LAST_PAGE : RESULTS;
+    state = hasNextPageData.length === 2 ? RESULTS : LAST_PAGE;
   }
 
+  console.log(state, data, 'this is state and data!');
+
   return {
-    serviceAccounts: data.slice(0, perPage),
+    serviceAccounts: [
+      ...data,
+      ...(hasNextPageData?.[0] ? [hasNextPageData?.[0]] : []),
+    ],
     state,
   };
 }
