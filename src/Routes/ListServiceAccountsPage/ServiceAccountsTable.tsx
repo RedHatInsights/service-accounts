@@ -13,6 +13,7 @@ import {
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 import { DateFormat } from '@redhat-cloud-services/frontend-components/DateFormat';
+import { ChromeUser } from '@redhat-cloud-services/types';
 import {
   ActionsColumn,
   Table /* data-codemods */,
@@ -22,7 +23,13 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import React, { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
@@ -46,15 +53,29 @@ export const ServiceAccountsTable: FunctionComponent<{
   isLoading,
 }) => {
   const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | undefined>();
+  const [isRbacAdmin, setIsRbacAdmin] = useState<boolean | undefined>();
+  const [currUser, setCurrUser] = useState<ChromeUser | undefined>();
   const navigate = useNavigate();
-  const { auth } = useChrome();
+  const { auth, getUserPermissions } = useChrome();
 
   useEffect(() => {
     const getUser = () => auth.getUser();
+    getUserPermissions().then((data) => {
+      setIsRbacAdmin(data.some(({ permission }) => permission === 'rbac:*:*'));
+    });
     getUser().then((data) => {
       setIsOrgAdmin(data?.identity?.user?.is_org_admin);
+      setCurrUser(data as ChromeUser);
     });
   }, []);
+
+  const canChange = useCallback(
+    (serviceAccount) =>
+      isOrgAdmin ||
+      isRbacAdmin ||
+      serviceAccount.createdBy === currUser?.identity.user?.username,
+    [isOrgAdmin, currUser?.identity.user?.username, isRbacAdmin]
+  );
 
   const itemCount = useMemo(
     () =>
@@ -162,14 +183,14 @@ export const ServiceAccountsTable: FunctionComponent<{
                     items={[
                       {
                         title: 'Reset credentials',
-                        isDisabled: !isOrgAdmin,
+                        isDisabled: !canChange(sa),
                         ouiaId: 'reset-credentials-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`reset/${sa.id}`)),
                       },
                       {
                         title: 'Delete service account',
-                        isDisabled: !isOrgAdmin,
+                        isDisabled: !canChange(sa),
                         ouiaId: 'delete-service-account-button',
                         onClick: () =>
                           navigate(mergeToBasename(`delete/${sa.id}`)),

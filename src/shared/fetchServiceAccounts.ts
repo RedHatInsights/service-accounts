@@ -51,8 +51,6 @@ export async function fetchServiceAccounts({
     state = hasNextPageData.length === 2 ? RESULTS : LAST_PAGE;
   }
 
-  console.log(state, data, 'this is state and data!');
-
   return {
     serviceAccounts: [
       ...data,
