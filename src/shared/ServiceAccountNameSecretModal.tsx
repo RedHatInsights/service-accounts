@@ -71,7 +71,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 </Content>
               </Content>
               <InputGroup className="pf-u-mt-lg">
-                <InputGroupText 
+                <InputGroupText
                   className="pf-u-text-nowrap pf-u-flex-shrink-0"
                   style={{ minWidth: '120px', textAlign: 'left' }}
                 >
