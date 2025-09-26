@@ -71,8 +71,11 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 </Content>
               </Content>
               <InputGroup className="pf-u-mt-lg">
-                <InputGroupText className="pf-u-text-nowrap">
-                  Client&nbsp;ID
+                <InputGroupText
+                  className="pf-u-text-nowrap pf-u-flex-shrink-0"
+                  style={{ minWidth: '120px', textAlign: 'left' }}
+                >
+                  Client ID
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
@@ -87,8 +90,11 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 </InputGroupItem>
               </InputGroup>
               <InputGroup className="pf-u-mt-md">
-                <InputGroupText className="pf-u-text-nowrap">
-                  Client&nbsp;secret
+                <InputGroupText
+                  className="pf-u-text-nowrap pf-u-flex-shrink-0"
+                  style={{ minWidth: '120px', textAlign: 'left' }}
+                >
+                  Client secret
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
