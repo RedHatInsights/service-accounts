@@ -33,7 +33,7 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
       id="modalCreateServiceAccountReset"
       variant={ModalVariant.medium}
       isOpen={true}
-      ouiaId={'modal-reset-service-account'}
+      ouiaId={'modal-delete-service-account'}
       appendTo={appendTo}
       onClose={onClose}
     >
@@ -59,10 +59,16 @@ export const DeleteModal: VoidFunctionComponent<DeleteModalProps> = ({
           isLoading={isDeleting}
           isDisabled={isDeleting || !name}
           onClick={onConfirm}
+          ouiaId="deletemodal-confirm-button"
         >
           Delete
         </Button>
-        <Button key="cancel" variant="link" onClick={onClose}>
+        <Button
+          key="cancel"
+          variant="link"
+          onClick={onClose}
+          ouiaId="deletemodal-cancel-button"
+        >
           Cancel
         </Button>
       </ModalFooter>
