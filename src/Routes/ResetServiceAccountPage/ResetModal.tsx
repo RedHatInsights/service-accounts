@@ -59,6 +59,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           isLoading={isResetting}
           isDisabled={isResetting || !name}
           onClick={onConfirm}
+          ouiaId="resetmodal-confirm-button"
         >
           Reset
         </Button>
@@ -66,6 +67,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           key="cancel"
           variant="link"
           component={(props) => <AppLink {...props} to={''} />}
+          ouiaId="resetmodal-cancel-button"
         >
           Cancel
         </Button>
