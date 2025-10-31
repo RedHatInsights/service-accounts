@@ -82,7 +82,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     className="pf-v6-u-w-100"
                     isReadOnly
                     data-testid="modalCredentials-copyClientID"
-                    data-ouia-component-id="button-copy-clientID"
+                    ouiaId="button-copy-clientID"
                     textAriaLabel="Client ID"
                   >
                     {serviceAccount.clientId}
@@ -101,7 +101,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     isReadOnly
                     className="pf-v6-u-w-100"
                     data-testid="modalCredentials-copyClientSecret"
-                    data-ouia-component-id="button-copy-clientSecret"
+                    ouiaId="button-copy-clientSecret"
                     textAriaLabel="Client secret"
                   >
                     {serviceAccount.secret}
