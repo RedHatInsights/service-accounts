@@ -70,7 +70,7 @@ export const ServiceAccountsTable: FunctionComponent<{
   }, []);
 
   const canChange = useCallback(
-    (serviceAccount) =>
+    (serviceAccount: ServiceAccount) =>
       isOrgAdmin ||
       isRbacAdmin ||
       serviceAccount.createdBy === currUser?.identity.user?.username,

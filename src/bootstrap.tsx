@@ -1,9 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import AppEntry from './AppEntry';
 
-const root = document.getElementById('root');
+const rootElement = document.getElementById('root');
 
-ReactDOM.render(<AppEntry />, root, () =>
-  root?.setAttribute('data-ouia-safe', 'true')
-);
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(<AppEntry />);
+  rootElement.setAttribute('data-ouia-safe', 'true');
+}
