@@ -21,3 +21,5 @@ coverage
 
 # cache folder
 .cache
+
+*storybook.log
