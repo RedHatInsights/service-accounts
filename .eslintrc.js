@@ -1,8 +1,5 @@
 module.exports = {
-  extends: [
-    '@redhat-cloud-services/eslint-config-redhat-cloud-services',
-    'plugin:@tanstack/eslint-plugin-query/recommended',
-  ],
+  extends: ['@redhat-cloud-services/eslint-config-redhat-cloud-services', 'plugin:@tanstack/eslint-plugin-query/recommended', 'plugin:storybook/recommended'],
   plugins: ['@tanstack/query'],
   globals: {
     insights: 'readonly',
