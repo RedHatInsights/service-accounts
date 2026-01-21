@@ -2,7 +2,7 @@
   "compilerOptions": {
     "jsx": "react",
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "target": "es5",
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,

@@ -7,11 +7,13 @@ import { Content, Icon } from '@patternfly/react-core';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import {
   LAST_PAGE,
   NO_DATA,
+  SortByField,
+  SortOrder,
   fetchServiceAccounts,
 } from '../../shared/fetchServiceAccounts';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
@@ -25,13 +27,44 @@ const ListServiceAccountsPage = () => {
   }, []);
 
   const { auth, getEnvironmentDetails } = useChrome();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+
   const page = parseInt(searchParams.get('page') || '', 10) || 1;
   const perPage = parseInt(searchParams.get('perPage') || '', 10) || 50;
 
+  const orderBy = (searchParams.get('orderBy') as SortByField) || 'name';
+  const sortOrder = (searchParams.get('sortOrder') as SortOrder) || 'asc';
+
+  const filterName = searchParams.get('name') || '';
+  const filterClientId = searchParams.get('clientId') || '';
+  const filterCreator = searchParams.get('creator') || '';
+
+  const filters = useMemo(
+    () => ({
+      ...(filterName && { name: filterName }),
+      ...(filterClientId && { clientId: filterClientId }),
+      ...(filterCreator && { creator: filterCreator }),
+    }),
+    [filterName, filterClientId, filterCreator]
+  );
+
+  const hasActiveFilters = !!(filterName || filterClientId || filterCreator);
+
   const queryClient = useQueryClient();
   const results = useQuery({
-    queryKey: ['service-accounts', { page, perPage }],
+    queryKey: [
+      'service-accounts',
+      {
+        page,
+        perPage,
+        orderBy,
+        sortOrder,
+        filterName,
+        filterClientId,
+        filterCreator,
+        filters,
+      },
+    ],
     queryFn: async () => {
       const env = getEnvironmentDetails();
       const token = await auth.getToken();
@@ -40,6 +73,9 @@ const ListServiceAccountsPage = () => {
         sso: env?.sso as string,
         page,
         perPage,
+        orderBy,
+        sortOrder,
+        filters,
       });
       response.serviceAccounts.forEach((sa) =>
         queryClient.setQueryData(['service-account', sa.id], sa)
@@ -76,17 +112,12 @@ const ListServiceAccountsPage = () => {
       </PageHeader>
       <Main>
         <>
-          {(results.data || results.isLoading) &&
-          results.data?.state !== NO_DATA ? (
+          {(results.data || results.isLoading || hasActiveFilters) &&
+          (results.data?.state !== NO_DATA || hasActiveFilters) ? (
             <ServiceAccountsTable
               serviceAccounts={results.data?.serviceAccounts || []}
-              page={page}
-              perPage={perPage}
               hasMore={results.data?.state !== LAST_PAGE}
               isLoading={results.isLoading}
-              onPaginationChange={(page, perPage) => {
-                setSearchParams({ page: `${page}`, perPage: `${perPage}` });
-              }}
             />
           ) : (
             <EmptyStateNoServiceAccounts />

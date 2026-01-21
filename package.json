@@ -3,8 +3,8 @@
   "version": "1.1.0",
   "private": false,
   "engines": {
-    "node": ">=16.20.2",
-    "npm": ">=7.24.2"
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "build": "fec build",
@@ -16,11 +16,17 @@
     "start": "HOT=true fec dev",
     "test": "jest --passWithNoTests",
     "postinstall": "ts-patch install && rimraf .cache",
-    "verify": "npm-run-all build lint test"
+    "verify": "npm-run-all build lint test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test-storybook": "test-storybook --testTimeout=30000",
+    "test-storybook:fast": "CI=true test-storybook --excludeTags test-skip --testTimeout=30000",
+    "test-storybook:ci": "test-storybook --ci --excludeTags test-skip --testTimeout=30000"
   },
   "dependencies": {
     "@patternfly/react-component-groups": "^6.4.0",
     "@patternfly/react-core": "^6.4.0",
+    "@patternfly/react-data-view": "^6.4.0",
     "@patternfly/react-icons": "^6.4.0",
     "@patternfly/react-table": "^6.4.0",
     "@redhat-cloud-services/frontend-components": "^6.1.1",
@@ -43,6 +49,10 @@
     "@redhat-cloud-services/eslint-config-redhat-cloud-services": "^1.3.0",
     "@redhat-cloud-services/frontend-components-config": "^6.7.4",
     "@redhat-cloud-services/tsc-transform-imports": "^1.0.26",
+    "@storybook/addon-docs": "^10.1.11",
+    "@storybook/addon-webpack5-compiler-swc": "^4.0.2",
+    "@storybook/react-webpack5": "^10.1.11",
+    "@storybook/test-runner": "^0.24.2",
     "@tanstack/eslint-plugin-query": "^4.39.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.3.1",
@@ -53,11 +63,19 @@
     "@typescript-eslint/parser": "^6.21.0",
     "babel-jest": "27.5.1",
     "babel-plugin-transform-imports": "^2.0.0",
+    "css-loader": "^7.1.2",
     "eslint": "8.57.1",
+    "eslint-plugin-storybook": "^10.1.11",
     "identity-obj-proxy": "3.0.0",
     "jest": "27.5.1",
+    "msw": "^2.12.7",
+    "msw-storybook-addon": "^2.0.6",
     "npm-run-all2": "5.0.2",
     "rimraf": "^3.0.2",
+    "sass": "^1.97.2",
+    "sass-loader": "^16.0.6",
+    "storybook": "^10.1.11",
+    "style-loader": "^4.0.0",
     "stylelint": "^16.26.1",
     "stylelint-config-recommended-scss": "^15.0.1",
     "stylelint-scss": "^6.13.0",
@@ -68,5 +86,10 @@
   "insights": {
     "appname": "service-accounts",
     "appUrl": "/iam/service-accounts"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

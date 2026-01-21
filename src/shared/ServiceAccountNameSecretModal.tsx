@@ -21,13 +21,11 @@ import React, { VoidFunctionComponent, useState } from 'react';
 import { NewServiceAccount } from '../types';
 import { AppLink } from './AppLink';
 import { appendTo } from './utils';
-import { useNavigate } from 'react-router-dom';
 
 export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
   serviceAccount: NewServiceAccount;
 }> = ({ serviceAccount }) => {
   const [confirmationCheckbox, confirm] = useState(false);
-  const navigate = useNavigate();
   return (
     <Modal
       id="modalCreateServiceAccountStep2"
@@ -36,7 +34,6 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
       isOpen
       appendTo={appendTo}
       ouiaId="modal-Credentials"
-      onClose={() => navigate('')}
     >
       <ModalBody>
         {serviceAccount.error ? (
