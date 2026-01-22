@@ -23,7 +23,7 @@ type Options = {
   filters?: ServiceAccountFilters;
 };
 
-function buildQueryParams(options: {
+export function buildQueryParams(options: {
   first: number;
   max: number;
   orderBy?: SortByField;
