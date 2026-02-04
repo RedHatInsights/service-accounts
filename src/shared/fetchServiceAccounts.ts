@@ -1,9 +1,5 @@
 import { ServiceAccount } from '../types';
 
-export const NO_DATA = 'no-data';
-export const LAST_PAGE = 'last-page';
-export const RESULTS = 'results';
-
 export type SortByField = 'name' | 'description' | 'createdAt' | 'clientId';
 export type SortOrder = 'asc' | 'desc';
 
@@ -55,9 +51,15 @@ export function buildQueryParams(options: {
   return params.toString();
 }
 
+/**
+ * Fetches service accounts using the N+1 pagination pattern.
+ * Since the API does not provide a total count, we request perPage + 1 items
+ * to determine if more pages exist. If we receive more than perPage items,
+ * we know there are additional pages and return only the first perPage items.
+ */
 export async function fetchServiceAccounts({
   page = 1,
-  perPage = 100,
+  perPage = 50,
   token,
   sso,
   orderBy,
@@ -65,54 +67,42 @@ export async function fetchServiceAccounts({
   filters,
 }: Options): Promise<{
   serviceAccounts: ServiceAccount[];
-  state: string;
+  hasMore: boolean;
 }> {
-  const first = (page - 1) * perPage;
+  const sanitizedPage = Math.max(1, Math.floor(page));
+  const sanitizedPerPage = Math.max(1, Math.floor(perPage));
+
+  const first = (sanitizedPage - 1) * sanitizedPerPage;
   const baseUrl = `${sso}realms/redhat-external/apis/service_accounts/v1`;
 
-  const mainQueryParams = buildQueryParams({
+  const queryParams = buildQueryParams({
     first,
-    max: perPage - 1,
+    max: sanitizedPerPage + 1,
     orderBy,
     sortOrder,
     filters,
   });
 
-  const nextPageQueryParams = buildQueryParams({
-    first: page * perPage - 1,
-    max: 2,
-    orderBy,
-    sortOrder,
-    filters,
-  });
-
-  const response = await fetch(`${baseUrl}?${mainQueryParams}`, {
+  const response = await fetch(`${baseUrl}?${queryParams}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  const hasNextPageResponse = await fetch(`${baseUrl}?${nextPageQueryParams}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  const data = await response.json();
-  const hasNextPageData = await hasNextPageResponse.json();
-
-  let state;
-  if (page === 1 && data.length === 0) {
-    state = NO_DATA;
-  } else {
-    state = hasNextPageData.length === 2 ? RESULTS : LAST_PAGE;
+  if (!response.ok) {
+    throw new Error(`Failed to fetch service accounts (${response.status})`);
   }
 
+  const data: ServiceAccount[] = await response.json();
+
+  if (!Array.isArray(data)) {
+    throw new Error('Unexpected service accounts response shape');
+  }
+
+  const hasMore = data.length > sanitizedPerPage;
+
   return {
-    serviceAccounts: [
-      ...data,
-      ...(hasNextPageData?.[0] ? [hasNextPageData?.[0]] : []),
-    ],
-    state,
+    serviceAccounts: hasMore ? data.slice(0, sanitizedPerPage) : data,
+    hasMore,
   };
 }

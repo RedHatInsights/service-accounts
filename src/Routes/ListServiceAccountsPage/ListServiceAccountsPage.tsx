@@ -4,14 +4,13 @@ import {
   PageHeaderTitle,
 } from '@redhat-cloud-services/frontend-components/PageHeader';
 import { Content, Icon } from '@patternfly/react-core';
+import ErrorState from '@patternfly/react-component-groups/dist/dynamic/ErrorState';
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useMemo } from 'react';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import {
-  LAST_PAGE,
-  NO_DATA,
   SortByField,
   SortOrder,
   fetchServiceAccounts,
@@ -112,11 +111,14 @@ const ListServiceAccountsPage = () => {
       </PageHeader>
       <Main>
         <>
-          {(results.data || results.isLoading || hasActiveFilters) &&
-          (results.data?.state !== NO_DATA || hasActiveFilters) ? (
+          {results.isError ? (
+            <ErrorState />
+          ) : results.isLoading ||
+            hasActiveFilters ||
+            (results.data?.serviceAccounts?.length ?? 0) > 0 ? (
             <ServiceAccountsTable
               serviceAccounts={results.data?.serviceAccounts || []}
-              hasMore={results.data?.state !== LAST_PAGE}
+              hasMore={results.data?.hasMore ?? false}
               isLoading={results.isLoading}
             />
           ) : (
