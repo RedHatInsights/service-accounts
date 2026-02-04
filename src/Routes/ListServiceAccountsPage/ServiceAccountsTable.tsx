@@ -39,6 +39,7 @@ import {
 import { DateFormat } from '@redhat-cloud-services/frontend-components/DateFormat';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { ChromeUser } from '@redhat-cloud-services/types';
+import { useFlag } from '@unleash/proxy-client-react';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 import { ServiceAccount } from '../../types';
@@ -69,6 +70,9 @@ export const ServiceAccountsTable: FunctionComponent<
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { auth, getUserPermissions } = useChrome();
+
+  const isSortingEnabled = useFlag('platform.service-accounts.sorting');
+  const isFilteringEnabled = useFlag('platform.service-accounts.filtering');
 
   const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | undefined>();
   const [isRbacAdmin, setIsRbacAdmin] = useState<boolean | undefined>();
@@ -120,6 +124,7 @@ export const ServiceAccountsTable: FunctionComponent<
 
   const getSortParams = useCallback(
     (columnIndex: number): ThProps['sort'] | undefined => {
+      if (!isSortingEnabled) return undefined;
       if (!(columnIndex in SORT_FIELD_MAP)) return undefined;
       return {
         sortBy: {
@@ -130,7 +135,7 @@ export const ServiceAccountsTable: FunctionComponent<
         columnIndex,
       };
     },
-    [activeSortIndex, activeSortDirection, handleSort]
+    [isSortingEnabled, activeSortIndex, activeSortDirection, handleSort]
   );
 
   const urlFilters = useMemo(
@@ -209,8 +214,8 @@ export const ServiceAccountsTable: FunctionComponent<
   }, [searchParams, setSearchParams]);
 
   const hasActiveFilters = useMemo(
-    () => FILTER_KEYS.some((key) => filterInputs[key]),
-    [filterInputs]
+    () => isFilteringEnabled && FILTER_KEYS.some((key) => filterInputs[key]),
+    [isFilteringEnabled, filterInputs]
   );
 
   const canChange = useCallback(
@@ -345,35 +350,37 @@ export const ServiceAccountsTable: FunctionComponent<
       <DataViewToolbar
         ouiaId={`${OUIA_ID}-header-toolbar`}
         filters={
-          <DataViewFilters
-            onChange={(_e, values) => {
-              Object.entries(values).forEach(([key, value]) => {
-                handleFilterChange(key as FilterKey, value as string);
-              });
-            }}
-            values={filterInputs}
-          >
-            <DataViewTextFilter
-              filterId="name"
-              title="Name"
-              placeholder="Filter by name"
-              ouiaId={`${OUIA_ID}-filter-name`}
-            />
-            <DataViewTextFilter
-              filterId="clientId"
-              title="Client ID"
-              placeholder="Filter by client ID"
-              ouiaId={`${OUIA_ID}-filter-clientId`}
-            />
-            <DataViewTextFilter
-              filterId="creator"
-              title="Owner"
-              placeholder="Filter by owner"
-              ouiaId={`${OUIA_ID}-filter-creator`}
-            />
-          </DataViewFilters>
+          isFilteringEnabled ? (
+            <DataViewFilters
+              onChange={(_e, values) => {
+                Object.entries(values).forEach(([key, value]) => {
+                  handleFilterChange(key as FilterKey, value as string);
+                });
+              }}
+              values={filterInputs}
+            >
+              <DataViewTextFilter
+                filterId="name"
+                title="Name"
+                placeholder="Filter by name"
+                ouiaId={`${OUIA_ID}-filter-name`}
+              />
+              <DataViewTextFilter
+                filterId="clientId"
+                title="Client ID"
+                placeholder="Filter by client ID"
+                ouiaId={`${OUIA_ID}-filter-clientId`}
+              />
+              <DataViewTextFilter
+                filterId="creator"
+                title="Owner"
+                placeholder="Filter by owner"
+                ouiaId={`${OUIA_ID}-filter-creator`}
+              />
+            </DataViewFilters>
+          ) : undefined
         }
-        clearAllFilters={clearAllFilters}
+        clearAllFilters={isFilteringEnabled ? clearAllFilters : undefined}
         actions={
           <ToolbarGroup>
             <ToolbarItem>

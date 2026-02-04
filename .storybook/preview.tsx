@@ -3,6 +3,7 @@ import type { Preview } from '@storybook/react-webpack5';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
+import { FeatureFlagsProvider } from './mocks/unleash.tsx';
 
 // PatternFly 6 styles
 import '@patternfly/react-core/dist/styles/base.css';
@@ -67,18 +68,59 @@ const preview: Preview = {
     },
     layout: 'padded',
   },
+  globalTypes: {
+    sortingFlag: {
+      name: 'Sorting',
+      description: 'Enable/disable sorting feature flag',
+      defaultValue: 'enabled',
+      toolbar: {
+        icon: 'listunordered',
+        items: [
+          { value: 'enabled', title: 'Sorting Enabled' },
+          { value: 'disabled', title: 'Sorting Disabled' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    filteringFlag: {
+      name: 'Filtering',
+      description: 'Enable/disable filtering feature flag',
+      defaultValue: 'enabled',
+      toolbar: {
+        icon: 'filter',
+        items: [
+          { value: 'enabled', title: 'Filtering Enabled' },
+          { value: 'disabled', title: 'Filtering Disabled' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
   decorators: [
     (Story, context) => {
-      // Allow stories to skip global decorators by setting skipGlobalDecorators parameter
+      // Get feature flag values from toolbar globals (convert string to boolean)
+      const featureFlags = {
+        'platform.service-accounts.sorting': context.globals.sortingFlag !== 'disabled',
+        'platform.service-accounts.filtering': context.globals.filteringFlag !== 'disabled',
+      };
+
+      // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
       if (context.parameters.skipGlobalDecorators) {
-        return <Story />;
-      }
-      return (
-        <QueryClientProvider client={queryClient}>
-          <MemoryRouter>
+        return (
+          <FeatureFlagsProvider flags={featureFlags}>
             <Story />
-          </MemoryRouter>
-        </QueryClientProvider>
+          </FeatureFlagsProvider>
+        );
+      }
+
+      return (
+        <FeatureFlagsProvider flags={featureFlags}>
+          <QueryClientProvider client={queryClient}>
+            <MemoryRouter>
+              <Story />
+            </MemoryRouter>
+          </QueryClientProvider>
+        </FeatureFlagsProvider>
       );
     },
   ],
