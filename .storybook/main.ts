@@ -35,6 +35,7 @@ const config: StorybookConfig = {
       '@redhat-cloud-services/frontend-components/Main': path.join(storybookDir, 'mocks/Main.tsx'),
       '@redhat-cloud-services/frontend-components/PageHeader': path.join(storybookDir, 'mocks/PageHeader.tsx'),
       '@redhat-cloud-services/frontend-components-notifications/hooks/useNotifications': path.join(storybookDir, 'mocks/useNotifications.ts'),
+      '@unleash/proxy-client-react': path.join(storybookDir, 'mocks/unleash.tsx'),
     };
 
     return config;
