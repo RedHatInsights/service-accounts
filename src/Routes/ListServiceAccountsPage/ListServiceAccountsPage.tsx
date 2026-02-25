@@ -51,19 +51,7 @@ const ListServiceAccountsPage = () => {
 
   const queryClient = useQueryClient();
   const results = useQuery({
-    queryKey: [
-      'service-accounts',
-      {
-        page,
-        perPage,
-        orderBy,
-        sortOrder,
-        filterName,
-        filterClientId,
-        filterCreator,
-        filters,
-      },
-    ],
+    queryKey: ['service-accounts', page, perPage, orderBy, sortOrder, filters],
     queryFn: async () => {
       const env = getEnvironmentDetails();
       const token = await auth.getToken();

@@ -55,6 +55,11 @@ import {
   SORT_FIELD_MAP,
   SORT_FIELD_TO_INDEX,
 } from './constants';
+import {
+  createClearFiltersParamsUpdater,
+  createFiltersParamsUpdater,
+  createSortParamsUpdater,
+} from './urlParams';
 
 export interface ServiceAccountsTableProps {
   serviceAccounts: ServiceAccount[];
@@ -110,16 +115,9 @@ export const ServiceAccountsTable: FunctionComponent<
       columnIndex: number,
       sortDirection: 'asc' | 'desc'
     ) => {
-      const sortField = SORT_FIELD_MAP[columnIndex];
-      if (!sortField) return;
-
-      const params = new URLSearchParams(searchParams);
-      params.set('orderBy', sortField);
-      params.set('sortOrder', sortDirection);
-      params.set('page', '1');
-      setSearchParams(params);
+      setSearchParams(createSortParamsUpdater(columnIndex, sortDirection));
     },
-    [searchParams, setSearchParams]
+    [setSearchParams]
   );
 
   const getSortParams = useCallback(
@@ -166,18 +164,9 @@ export const ServiceAccountsTable: FunctionComponent<
 
   const updateUrlWithFilters = useCallback(
     (newFilters: Record<FilterKey, string>) => {
-      const params = new URLSearchParams(searchParams);
-      FILTER_KEYS.forEach((key) => {
-        if (newFilters[key]) {
-          params.set(key, newFilters[key]);
-        } else {
-          params.delete(key);
-        }
-      });
-      params.set('page', '1');
-      setSearchParams(params);
+      setSearchParams(createFiltersParamsUpdater(newFilters));
     },
-    [searchParams, setSearchParams]
+    [setSearchParams]
   );
 
   const handleFilterChange = useCallback(
@@ -207,11 +196,8 @@ export const ServiceAccountsTable: FunctionComponent<
     );
     setFilterInputs(clearedFilters);
 
-    const params = new URLSearchParams(searchParams);
-    FILTER_KEYS.forEach((key) => params.delete(key));
-    params.set('page', '1');
-    setSearchParams(params);
-  }, [searchParams, setSearchParams]);
+    setSearchParams(createClearFiltersParamsUpdater());
+  }, [setSearchParams]);
 
   const hasActiveFilters = useMemo(
     () => isFilteringEnabled && FILTER_KEYS.some((key) => filterInputs[key]),
