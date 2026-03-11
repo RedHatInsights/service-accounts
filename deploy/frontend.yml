@@ -52,7 +52,7 @@ objects:
                 - method: scope
                   args:
                     - api.iam.service_accounts
-        # Standalone IAM nav segment (e.g. when not under Access Management)
+        # Standalone IAM nav segment (fallback when not under Access Management)
         - segmentId: service-accounts-iam
           bundleId: iam
           position: 2000
@@ -60,6 +60,14 @@ objects:
             - id: service-accounts
               title: Service Accounts
               href: /iam/service-accounts
+              permissions:
+                - method: featureFlag
+                  args:
+                    - platform.rbac.workspaces-organization-management
+                    - false
+                - method: scope
+                  args:
+                    - api.iam.service_accounts
       module:
         manifestLocation: "/apps/service-accounts/fed-mods.json"
         config:
