@@ -36,13 +36,38 @@ objects:
         description: ''
 
       bundleSegments:
+        # Segment for RBAC’s segmentRef: merged under IAM “Access Management” when platform.rbac.workspaces-organization-management is true
+        - segmentId: iam-access-management-service-accounts
+          bundleId: iam
+          position: 2000
+          navItems:
+            - id: service-accounts
+              title: Service Accounts
+              href: /iam/service-accounts
+              permissions:
+                - method: featureFlag
+                  args:
+                    - platform.rbac.workspaces-organization-management
+                    - true
+                - method: scope
+                  args:
+                    - api.iam.service_accounts
+        # Standalone IAM nav segment (fallback when not under Access Management)
         - segmentId: service-accounts-iam
           bundleId: iam
           position: 2000
           navItems:
-          - id: service-accounts
-            title: Service Accounts
-            href: /iam/service-accounts
+            - id: service-accounts
+              title: Service Accounts
+              href: /iam/service-accounts
+              permissions:
+                - method: featureFlag
+                  args:
+                    - platform.rbac.workspaces-organization-management
+                    - false
+                - method: scope
+                  args:
+                    - api.iam.service_accounts
       module:
         manifestLocation: "/apps/service-accounts/fed-mods.json"
         config:
