@@ -10,8 +10,8 @@
     "build": "fec build",
     "deploy": "npm-run-all build lint test",
     "lint": "npm-run-all lint:*",
-    "lint:js": "eslint config src",
-    "lint:js:fix": "eslint config src --fix",
+    "lint:js": "eslint config src playwright/**/*.ts",
+    "lint:js:fix": "eslint config src playwright/**/*.ts --fix",
     "patch:hosts": "fec patch-etc-hosts",
     "start": "HOT=true fec dev",
     "test": "jest --passWithNoTests",
@@ -21,7 +21,8 @@
     "build-storybook": "storybook build",
     "test-storybook": "test-storybook --testTimeout=30000",
     "test-storybook:fast": "CI=true test-storybook --excludeTags test-skip --testTimeout=30000",
-    "test-storybook:ci": "test-storybook --ci --excludeTags test-skip --testTimeout=30000"
+    "test-storybook:ci": "test-storybook --ci --excludeTags test-skip --testTimeout=30000",
+    "test:playwright": "playwright test"
   },
   "dependencies": {
     "@patternfly/react-component-groups": "^6.4.0",
@@ -53,6 +54,7 @@
     "@storybook/addon-docs": "^10.2.19",
     "@storybook/addon-webpack5-compiler-swc": "^4.0.2",
     "@storybook/react-webpack5": "^10.2.19",
+    "@playwright/test": "^1.48.0",
     "@storybook/test-runner": "^0.24.2",
     "@tanstack/eslint-plugin-query": "^4.43.0",
     "@testing-library/jest-dom": "^5.17.0",
