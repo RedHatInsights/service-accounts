@@ -36,7 +36,7 @@ objects:
         description: ''
 
       bundleSegments:
-        # Segment for RBAC’s segmentRef: merged under IAM “Access Management” when platform.rbac.workspaces-organization-management is true
+        # Segment for RBAC’s segmentRef: merged under IAM “Access Management” when platform.rbac.workspaces is true
         - segmentId: iam-access-management-service-accounts
           bundleId: iam
           position: 2000
@@ -47,7 +47,7 @@ objects:
               permissions:
                 - method: featureFlag
                   args:
-                    - platform.rbac.workspaces-organization-management
+                    - platform.rbac.workspaces
                     - true
                 - method: scope
                   args:
@@ -63,7 +63,7 @@ objects:
               permissions:
                 - method: featureFlag
                   args:
-                    - platform.rbac.workspaces-organization-management
+                    - platform.rbac.workspaces
                     - false
                 - method: scope
                   args:
