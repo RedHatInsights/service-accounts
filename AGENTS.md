@@ -6,7 +6,7 @@ Service Accounts is a React frontend for managing service account credentials on
 
 ## Project Structure
 
-```
+```text
 service-accounts/
 ├── src/
 │   ├── App.tsx                  # Root component (useChrome, NotificationsProvider)
@@ -79,21 +79,23 @@ service-accounts/
 
 ## Tech Stack
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| React | ^18.3.1 | UI framework |
-| TypeScript | ^5.9.3 | Type safety (`strict: true`) |
-| PatternFly 6 | ^6.4.x | Component library (`@patternfly/react-core`, `react-table`, `react-data-view`, `react-component-groups`, `react-icons`) |
-| React Router DOM | ^6.30.3 | Client-side routing |
-| TanStack React Query | ^4.43.0 | Server state management |
-| Unleash | ^5.0.1 | Feature flags (`@unleash/proxy-client-react`) |
-| Webpack 5 | via `@redhat-cloud-services/frontend-components-config` | Module bundling + federation |
-| Jest 27 | 27.5.1 | Unit testing (jsdom, identity-obj-proxy for CSS) |
-| Storybook 10 | ^10.3.1 | Component stories + interaction tests |
-| MSW 2 | ^2.12.13 | API mocking (Storybook + tests) |
-| Playwright | ^1.58.2 | E2E tests (authenticated, against stage) |
-| ESLint 8 | 8.57.1 | Linting (`@redhat-cloud-services` config) |
-| Stylelint | ^16.26.1 | SCSS linting |
+| Technology | Purpose |
+|-----------|---------|
+| React 18 | UI framework |
+| TypeScript 5 | Type safety (`strict: true`) |
+| PatternFly 6 | Component library (`@patternfly/react-core`, `react-table`, `react-data-view`, `react-component-groups`, `react-icons`) |
+| React Router DOM 6 | Client-side routing |
+| TanStack React Query v4 | Server state management |
+| Unleash | Feature flags (`@unleash/proxy-client-react`) |
+| Webpack 5 | Module bundling + federation (via `@redhat-cloud-services/frontend-components-config`) |
+| Jest 27 | Unit testing (jsdom, identity-obj-proxy for CSS) |
+| Storybook 10 | Component stories + interaction tests |
+| MSW 2 | API mocking (Storybook + tests) |
+| Playwright | E2E tests (authenticated, against stage) |
+| ESLint 8 | Linting (`@redhat-cloud-services` config) |
+| Stylelint | SCSS linting |
+
+> **Note**: For exact dependency versions, see `package.json` as the source of truth.
 
 ## Module Federation
 

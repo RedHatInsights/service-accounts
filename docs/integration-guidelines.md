@@ -9,7 +9,7 @@ Service Accounts is a federated module loaded by [insights-chrome](https://githu
 **`fec.config.js`** — frontend components config:
 - `appUrl`: `/iam/service-accounts` (from `package.json insights.appUrl`)
 - `moduleFederation.exclude`: `['react-router-dom']` — excluded from federation, shared as singleton
-- `moduleFederation.shared`: `react-router-dom` as singleton (v^6.3.0)
+- `moduleFederation.shared`: `react-router-dom` as singleton (MF compatibility range `^6.3.0`; installed version `^6.30.3` — see `package.json`)
 - `routes`: optional local chrome-service proxy via `REMOTE_CONFIG` env var
 
 **`deploy/frontend.yml`** — Frontend CRD deployed to OpenShift:
@@ -20,7 +20,7 @@ Service Accounts is a federated module loaded by [insights-chrome](https://githu
 
 ### Bootstrap Chain
 
-```
+```text
 entry.ts → bootstrap.tsx → AppEntry.tsx → App.tsx → Routes.tsx → Page components
 ```
 

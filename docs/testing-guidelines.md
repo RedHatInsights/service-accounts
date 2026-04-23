@@ -23,7 +23,7 @@
 
 Tests are colocated with source files:
 
-```
+```text
 src/shared/fetchServiceAccounts.ts
 src/shared/fetchServiceAccounts.test.ts
 ```
