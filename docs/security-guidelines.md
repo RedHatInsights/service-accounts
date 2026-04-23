@@ -2,13 +2,14 @@
 
 ## Authentication
 
-All API calls require a Bearer token from Red Hat SSO. The token is obtained via Chrome's auth API:
+This application communicates with **external SSO APIs** (e.g. `sso.redhat.com/realms/redhat-external/apis/service_accounts/v1`), which require a Bearer token obtained via Chrome's auth API. This is only necessary because the API lives outside the platform proxy — if the app were to communicate with `/api/...` endpoints, auth would be handled automatically by the platform (cookie-based, no explicit token needed).
 
 ```typescript
 const { auth, getEnvironmentDetails } = useChrome();
 const token = await auth.getToken();
 const env = getEnvironmentDetails();
-// API call: fetch(`${env.sso}realms/redhat-external/apis/service_accounts/v1`, {
+// External SSO API call — requires explicit Bearer token:
+// fetch(`${env.sso}realms/redhat-external/apis/service_accounts/v1`, {
 //   headers: { Authorization: `Bearer ${token}` }
 // });
 ```
@@ -18,6 +19,7 @@ const env = getEnvironmentDetails();
 - **Never hardcode SSO URLs** — always use `getEnvironmentDetails().sso` which returns the correct URL for the current environment (stage/prod).
 - **Never store tokens** — call `auth.getToken()` for each request. Chrome handles token refresh.
 - **Never expose tokens in logs or error messages** — the shared API functions in `src/shared/` handle auth headers internally.
+- **Explicit auth is for external APIs only** — platform `/api/...` routes use cookie-based auth through the console proxy and do not require `auth.getToken()`.
 
 ## Authorization
 
@@ -37,13 +39,13 @@ Not all users can modify all service accounts. The `ServiceAccountsTable` compon
 
 ```typescript
 const canChange = (serviceAccount: ServiceAccount) =>
-  isOrgAdmin ||
   isRbacAdmin ||
+  isOrgAdmin || // legacy — being deprecated
   serviceAccount.createdBy === currUser?.identity.user?.username;
 ```
 
-- **Org admin**: `auth.getUser().identity.user.is_org_admin`
-- **RBAC admin**: has `rbac:*:*` permission via `getUserPermissions()`
+- **RBAC admin** (primary): has `rbac:*:*` permission via `getUserPermissions()` — this is the preferred permission model
+- **Org admin** (legacy, being deprecated): `auth.getUser().identity.user.is_org_admin` — will be replaced by RBAC admin in the near future; do not build new features relying on org admin checks
 - **Creator**: `serviceAccount.createdBy` matches current user
 
 Reset and Delete actions are disabled if the user cannot change the service account.
