@@ -3,7 +3,7 @@ import type { Preview } from '@storybook/react-webpack5';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
-import { FeatureFlagsProvider } from './mocks/unleash.tsx';
+import { FeatureFlagsProvider } from '@redhat-cloud-services/hcc-storybook-hub';
 
 // PatternFly 6 styles
 import '@patternfly/react-core/dist/styles/base.css';
@@ -107,14 +107,14 @@ const preview: Preview = {
       // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
       if (context.parameters.skipGlobalDecorators) {
         return (
-          <FeatureFlagsProvider flags={featureFlags}>
+          <FeatureFlagsProvider value={featureFlags}>
             <Story />
           </FeatureFlagsProvider>
         );
       }
 
       return (
-        <FeatureFlagsProvider flags={featureFlags}>
+        <FeatureFlagsProvider value={featureFlags}>
           <QueryClientProvider client={queryClient}>
             <MemoryRouter>
               <Story />
