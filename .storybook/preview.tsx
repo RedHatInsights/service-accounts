@@ -3,7 +3,7 @@ import type { Preview } from '@storybook/react-webpack5';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
-import { FeatureFlagsProvider } from '@redhat-cloud-services/hcc-storybook-hub';
+import { FeatureFlagsProvider, StorybookMockProvider } from '@redhat-cloud-services/hcc-storybook-hub';
 
 // PatternFly 6 styles
 import '@patternfly/react-core/dist/styles/base.css';
@@ -21,40 +21,11 @@ const queryClient = new QueryClient({
   },
 });
 
-// Mock Chrome context for frontend-components
-const mockChrome = {
-  auth: {
-    getUser: () => Promise.resolve({
-      identity: {
-        user: {
-          username: 'john.doe',
-          is_org_admin: true,
-        },
-      },
-    }),
-    getToken: () => Promise.resolve('mock-token'),
-  },
-  getUserPermissions: () => Promise.resolve([
-    { permission: 'rbac:*:*' }
-  ]),
-  appAction: () => {},
-  getEnvironmentDetails: () => ({
-    sso: 'https://sso.example.com/',
-  }),
-};
-
-// Inject mock into window for useChrome hook
-if (typeof window !== 'undefined') {
-  (window as any).insights = {
-    chrome: mockChrome,
-  };
-
-  // Create portal target for modals (used by appendTo in utils.ts)
-  if (!document.getElementById('chrome-app-render-root')) {
-    const portalRoot = document.createElement('div');
-    portalRoot.id = 'chrome-app-render-root';
-    document.body.appendChild(portalRoot);
-  }
+// Create portal target for modals (used by appendTo in utils.ts)
+if (typeof window !== 'undefined' && !document.getElementById('chrome-app-render-root')) {
+  const portalRoot = document.createElement('div');
+  portalRoot.id = 'chrome-app-render-root';
+  document.body.appendChild(portalRoot);
 }
 
 const preview: Preview = {
@@ -107,20 +78,24 @@ const preview: Preview = {
       // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
       if (context.parameters.skipGlobalDecorators) {
         return (
-          <FeatureFlagsProvider value={featureFlags}>
-            <Story />
-          </FeatureFlagsProvider>
+          <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
+            <FeatureFlagsProvider value={featureFlags}>
+              <Story />
+            </FeatureFlagsProvider>
+          </StorybookMockProvider>
         );
       }
 
       return (
-        <FeatureFlagsProvider value={featureFlags}>
-          <QueryClientProvider client={queryClient}>
-            <MemoryRouter>
-              <Story />
-            </MemoryRouter>
-          </QueryClientProvider>
-        </FeatureFlagsProvider>
+        <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
+          <FeatureFlagsProvider value={featureFlags}>
+            <QueryClientProvider client={queryClient}>
+              <MemoryRouter>
+                <Story />
+              </MemoryRouter>
+            </QueryClientProvider>
+          </FeatureFlagsProvider>
+        </StorybookMockProvider>
       );
     },
   ],
