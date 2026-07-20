@@ -1,4 +1,4 @@
-import { createMainConfig } from '@redhat-cloud-services/hcc-storybook-hub/main-config';
+import { createMainConfig } from '@redhat-cloud-services/hcc-storybook-hub/config';
 import path from 'path';
 
 const mocksDir = path.join(process.cwd(), '.storybook/mocks');
