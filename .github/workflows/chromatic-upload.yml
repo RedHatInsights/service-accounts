@@ -1,17 +1,17 @@
-name: Chromatic Deployment
+name: Chromatic Upload
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Storybook"]
+    types: [completed]
 
 concurrency:
-  group: chromatic-${{ github.event.pull_request.number || github.ref }}
+  group: chromatic-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: true
 
 permissions:
   contents: read
+  actions: read
   pull-requests: write
 
 jobs:
