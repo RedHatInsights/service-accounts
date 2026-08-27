@@ -1,0 +1,20 @@
+name: Storybook
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: storybook-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  storybook:
+    uses: RedHatInsights/shared-workflows/.github/workflows/reusable-storybook.yml@fdaa8fa249caa5c09ef9661f8b4222ae9125095d # main
+    with:
+      node-version: '22'

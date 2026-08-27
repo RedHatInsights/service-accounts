@@ -1,0 +1,21 @@
+name: Chromatic Upload
+
+on:
+  workflow_run:
+    workflows: ["Storybook"]
+    types: [completed]
+
+concurrency:
+  group: chromatic-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  chromatic:
+    uses: RedHatInsights/shared-workflows/.github/workflows/reusable-chromatic.yml@fdaa8fa249caa5c09ef9661f8b4222ae9125095d # main
+    secrets:
+      chromatic-project-token: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
