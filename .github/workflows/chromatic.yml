@@ -68,7 +68,7 @@ jobs:
         env:
           CI: true
 
-  # Job to check if user has repository access (simpler approach)
+  # Job to check if user has repository access
   check-permissions:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-24.04
@@ -82,24 +82,46 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             try {
-              // Simple approach: check if user has write access to the repository
-              // This works for organization members with appropriate permissions
-              const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
+              const requiredLevels = ['write', 'admin', 'maintain'];
+
+              const prAuthor = context.payload.pull_request.user.login;
+              const { data: prAuthorPerm } = await github.rest.repos.getCollaboratorPermissionLevel({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                username: context.payload.pull_request.user.login
+                username: prAuthor
               });
-              
-              const hasAccess = ['write', 'admin', 'maintain'].includes(permission.permission);
-              core.setOutput('has-access', hasAccess);
-              
-              if (hasAccess) {
-                core.info(`User ${context.payload.pull_request.user.login} has ${permission.permission} access to the repository`);
-              } else {
-                core.info(`User ${context.payload.pull_request.user.login} has ${permission.permission} access - not sufficient for Chromatic deployment`);
+              const prAuthorHasAccess = requiredLevels.includes(prAuthorPerm.permission);
+              core.info(`PR author ${prAuthor} has ${prAuthorPerm.permission} access`);
+
+              if (!prAuthorHasAccess) {
+                core.setOutput('has-access', false);
+                return;
               }
+
+              const headSha = context.payload.pull_request.head.sha;
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: headSha
+              });
+              const commitAuthor = commit.author?.login;
+
+              if (!commitAuthor) {
+                core.info(`Head commit ${headSha} has no linked GitHub account — denying`);
+                core.setOutput('has-access', false);
+                return;
+              }
+
+              const { data: commitAuthorPerm } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: commitAuthor
+              });
+              const commitAuthorHasAccess = requiredLevels.includes(commitAuthorPerm.permission);
+              core.info(`Head commit author ${commitAuthor} has ${commitAuthorPerm.permission} access`);
+
+              core.setOutput('has-access', prAuthorHasAccess && commitAuthorHasAccess);
             } catch (error) {
-              // If we can't check permissions, assume no access for security
               core.info(`Error checking permissions: ${error.message}`);
               core.setOutput('has-access', false);
             }
@@ -116,15 +138,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # For pull_request_target, checkout the PR head
           ref: ${{ github.event.pull_request.head.sha }}
-          # Fetch full history for Chromatic
           fetch-depth: 0
 
-      - uses: './.github/actions/setup-environment'
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            **/node_modules
+          key: install-cache-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Build Storybook and deploy to Chromatic
         id: chromatic-deployment
@@ -144,18 +172,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # For pull_request_target, checkout the PR head
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-          
-      - uses: './.github/actions/setup-environment'
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: '.nvmrc'
+
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            **/node_modules
+          key: install-cache-${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: npm ci
-        
+        run: npm ci --ignore-scripts
+
       - name: Install Playwright
         run: npx playwright install --with-deps
-        
+
       - name: Run Storybook tests
         run: npm run test-storybook:ci -- --url ${{ needs.chromatic-deployment-pr.outputs.storybookUrl }}
         env:
