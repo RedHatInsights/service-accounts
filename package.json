@@ -4,7 +4,7 @@
   "private": false,
   "engines": {
     "node": ">=16.0.0",
-    "npm": ">=7.0.0"
+    "npm": ">=7.24.2"
   },
   "scripts": {
     "build": "fec build",
