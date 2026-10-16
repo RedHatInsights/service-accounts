@@ -9,6 +9,7 @@ import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/exte
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useMemo } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import {
   SortByField,
@@ -18,8 +19,25 @@ import {
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 
+const messages = defineMessages({
+  title: {
+    id: 'serviceAccounts.list.title',
+    defaultMessage: 'Service Accounts',
+  },
+  description: {
+    id: 'serviceAccounts.list.description',
+    defaultMessage:
+      'Use service accounts to securely and automatically connect and authenticate services or applications without requiring an end user’s credentials or direct interaction.',
+  },
+  learnMore: {
+    id: 'serviceAccounts.list.learnMore',
+    defaultMessage: 'Watch a video to learn more',
+  },
+});
+
 const ListServiceAccountsPage = () => {
   const { appAction } = useChrome();
+  const intl = useIntl();
 
   useEffect(() => {
     appAction('service-accounts-list');
@@ -77,20 +95,18 @@ const ListServiceAccountsPage = () => {
       <PageHeader>
         <PageHeaderTitle
           ouiaId="service-accounts-page-title"
-          title="Service Accounts"
+          title={intl.formatMessage(messages.title)}
         />
         <Content>
           <Content component="p" className="pf-v6-u-pt-sm">
-            Use service accounts to securely and automatically connect and
-            authenticate services or applications without requiring an end
-            user&#39;s credentials or direct interaction.
+            <FormattedMessage {...messages.description} />
           </Content>
           <Content
             component="a"
             href="https://youtu.be/UvNcmJsbg1w"
             target="_blank"
           >
-            Watch a video to learn more
+            <FormattedMessage {...messages.learnMore} />
             <Icon className="pf-v6-u-ml-sm" size="md" isInline>
               <ExternalLinkAltIcon />
             </Icon>

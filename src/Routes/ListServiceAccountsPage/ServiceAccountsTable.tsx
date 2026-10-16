@@ -40,6 +40,7 @@ import { DateFormat } from '@redhat-cloud-services/frontend-components/DateForma
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { ChromeUser } from '@redhat-cloud-services/types';
 import { useFlag } from '@unleash/proxy-client-react';
+import { defineMessages, useIntl } from 'react-intl';
 import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 import { ServiceAccount } from '../../types';
@@ -61,6 +62,86 @@ import {
   createSortParamsUpdater,
 } from './urlParams';
 
+const messages = defineMessages({
+  columnName: {
+    id: 'serviceAccounts.table.column.name',
+    defaultMessage: 'Name',
+  },
+  columnDescription: {
+    id: 'serviceAccounts.table.column.description',
+    defaultMessage: 'Description',
+  },
+  columnClientId: {
+    id: 'serviceAccounts.table.column.clientId',
+    defaultMessage: 'Client ID',
+  },
+  columnOwner: {
+    id: 'serviceAccounts.table.column.owner',
+    defaultMessage: 'Owner',
+  },
+  columnTimeCreated: {
+    id: 'serviceAccounts.table.column.timeCreated',
+    defaultMessage: 'Time created',
+  },
+  columnActionsSr: {
+    id: 'serviceAccounts.table.column.actionsSr',
+    defaultMessage: 'Actions',
+  },
+  filterNamePlaceholder: {
+    id: 'serviceAccounts.table.filter.namePlaceholder',
+    defaultMessage: 'Filter by name',
+  },
+  filterClientIdPlaceholder: {
+    id: 'serviceAccounts.table.filter.clientIdPlaceholder',
+    defaultMessage: 'Filter by client ID',
+  },
+  filterOwnerPlaceholder: {
+    id: 'serviceAccounts.table.filter.ownerPlaceholder',
+    defaultMessage: 'Filter by owner',
+  },
+  createButton: {
+    id: 'serviceAccounts.table.createButton',
+    defaultMessage: 'Create service account',
+  },
+  tableAriaLabel: {
+    id: 'serviceAccounts.table.ariaLabel',
+    defaultMessage: 'List of created service accounts',
+  },
+  actionResetCredentials: {
+    id: 'serviceAccounts.table.action.resetCredentials',
+    defaultMessage: 'Reset credentials',
+  },
+  actionDelete: {
+    id: 'serviceAccounts.table.action.delete',
+    defaultMessage: 'Delete service account',
+  },
+  paginationOf: {
+    id: 'serviceAccounts.table.pagination.of',
+    defaultMessage: 'of',
+  },
+  paginationMany: {
+    id: 'serviceAccounts.table.pagination.many',
+    defaultMessage: 'many',
+  },
+  emptyTitle: {
+    id: 'serviceAccounts.table.empty.title',
+    defaultMessage: 'No results found',
+  },
+  emptyFilteredBody: {
+    id: 'serviceAccounts.table.empty.filteredBody',
+    defaultMessage:
+      'No results match the filter criteria. Clear all filters and try again.',
+  },
+  emptyBody: {
+    id: 'serviceAccounts.table.empty.body',
+    defaultMessage: 'No service accounts found.',
+  },
+  emptyClearFilters: {
+    id: 'serviceAccounts.table.empty.clearFilters',
+    defaultMessage: 'Clear all filters',
+  },
+});
+
 export interface ServiceAccountsTableProps {
   serviceAccounts: ServiceAccount[];
   itemCount?: number;
@@ -75,6 +156,7 @@ export const ServiceAccountsTable: FunctionComponent<
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { auth, getUserPermissions } = useChrome();
+  const intl = useIntl();
 
   const isSortingEnabled = useFlag('platform.service-accounts.sorting');
   const isFilteringEnabled = useFlag('platform.service-accounts.filtering');
@@ -229,29 +311,30 @@ export const ServiceAccountsTable: FunctionComponent<
           <b>
             {firstIndex} - {count}
           </b>{' '}
-          of <b>{hasMore ? 'many' : count}</b>
+          {intl.formatMessage(messages.paginationOf)}{' '}
+          <b>{hasMore ? intl.formatMessage(messages.paginationMany) : count}</b>
         </>
       );
     },
-    [page, perPage, serviceAccounts.length, hasMore]
+    [page, perPage, serviceAccounts.length, hasMore, intl]
   );
 
   const getRowActions = useCallback(
     (sa: ServiceAccount) => [
       {
-        title: 'Reset credentials',
+        title: intl.formatMessage(messages.actionResetCredentials),
         isDisabled: !canChange(sa),
         ouiaId: 'reset-credentials-service-account-button',
         onClick: () => navigate(mergeToBasename(`reset/${sa.id}`)),
       },
       {
-        title: 'Delete service account',
+        title: intl.formatMessage(messages.actionDelete),
         isDisabled: !canChange(sa),
         ouiaId: 'delete-service-account-button',
         onClick: () => navigate(mergeToBasename(`delete/${sa.id}`)),
       },
     ],
-    [canChange, navigate]
+    [canChange, navigate, intl]
   );
 
   const rows: DataViewTr[] = useMemo(
@@ -275,14 +358,28 @@ export const ServiceAccountsTable: FunctionComponent<
 
   const columns: DataViewTh[] = useMemo(
     () => [
-      { cell: 'Name', props: { sort: getSortParams(0) } },
-      { cell: 'Description', props: { sort: getSortParams(1) } },
-      'Client ID',
-      'Owner',
-      { cell: 'Time created', props: { sort: getSortParams(4) } },
-      { cell: '', props: { screenReaderText: 'Actions' } },
+      {
+        cell: intl.formatMessage(messages.columnName),
+        props: { sort: getSortParams(0) },
+      },
+      {
+        cell: intl.formatMessage(messages.columnDescription),
+        props: { sort: getSortParams(1) },
+      },
+      intl.formatMessage(messages.columnClientId),
+      intl.formatMessage(messages.columnOwner),
+      {
+        cell: intl.formatMessage(messages.columnTimeCreated),
+        props: { sort: getSortParams(4) },
+      },
+      {
+        cell: '',
+        props: {
+          screenReaderText: intl.formatMessage(messages.columnActionsSr),
+        },
+      },
     ],
-    [getSortParams]
+    [getSortParams, intl]
   );
 
   const columnCount = columns.length;
@@ -299,12 +396,12 @@ export const ServiceAccountsTable: FunctionComponent<
           <EmptyState
             headingLevel="h4"
             icon={SearchIcon}
-            titleText="No results found"
+            titleText={intl.formatMessage(messages.emptyTitle)}
           >
             <EmptyStateBody>
               {hasActiveFilters
-                ? 'No results match the filter criteria. Clear all filters and try again.'
-                : 'No service accounts found.'}
+                ? intl.formatMessage(messages.emptyFilteredBody)
+                : intl.formatMessage(messages.emptyBody)}
             </EmptyStateBody>
             {hasActiveFilters && (
               <EmptyStateFooter>
@@ -314,7 +411,7 @@ export const ServiceAccountsTable: FunctionComponent<
                     variant="link"
                     onClick={clearAllFilters}
                   >
-                    Clear all filters
+                    {intl.formatMessage(messages.emptyClearFilters)}
                   </Button>
                 </EmptyStateActions>
               </EmptyStateFooter>
@@ -347,20 +444,24 @@ export const ServiceAccountsTable: FunctionComponent<
             >
               <DataViewTextFilter
                 filterId="name"
-                title="Name"
-                placeholder="Filter by name"
+                title={intl.formatMessage(messages.columnName)}
+                placeholder={intl.formatMessage(messages.filterNamePlaceholder)}
                 ouiaId={`${OUIA_ID}-filter-name`}
               />
               <DataViewTextFilter
                 filterId="clientId"
-                title="Client ID"
-                placeholder="Filter by client ID"
+                title={intl.formatMessage(messages.columnClientId)}
+                placeholder={intl.formatMessage(
+                  messages.filterClientIdPlaceholder
+                )}
                 ouiaId={`${OUIA_ID}-filter-clientId`}
               />
               <DataViewTextFilter
                 filterId="creator"
-                title="Owner"
-                placeholder="Filter by owner"
+                title={intl.formatMessage(messages.columnOwner)}
+                placeholder={intl.formatMessage(
+                  messages.filterOwnerPlaceholder
+                )}
                 ouiaId={`${OUIA_ID}-filter-creator`}
               />
             </DataViewFilters>
@@ -374,7 +475,7 @@ export const ServiceAccountsTable: FunctionComponent<
                 ouiaId={`${OUIA_ID}-create-button`}
                 component={(props) => (
                   <AppLink {...props} to="create">
-                    Create service account
+                    {intl.formatMessage(messages.createButton)}
                   </AppLink>
                 )}
               />
@@ -395,7 +496,7 @@ export const ServiceAccountsTable: FunctionComponent<
       />
 
       <DataViewTable
-        aria-label="List of created service accounts"
+        aria-label={intl.formatMessage(messages.tableAriaLabel)}
         ouiaId={OUIA_ID}
         columns={columns}
         rows={rows}

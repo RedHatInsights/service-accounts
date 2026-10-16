@@ -2,16 +2,25 @@ import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome'
 import { useAddNotification } from '@redhat-cloud-services/frontend-components-notifications/hooks/useNotifications';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
+import { defineMessages, useIntl } from 'react-intl';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteServiceAccount } from '../../shared/deleteServiceAccount';
 import { fetchServiceAccount } from '../../shared/fetchServiceAccount';
 import { mergeToBasename } from '../../shared/utils';
 import { DeleteModal, DeleteModalProps } from './DeleteModal';
 
+const messages = defineMessages({
+  deletedNotification: {
+    id: 'serviceAccounts.delete.notification',
+    defaultMessage: '{name} service account deleted',
+  },
+});
+
 const DeleteServiceAccountPage = () => {
   const { clientId } = useParams<{ clientId: string }>();
   const { appAction } = useChrome();
   const addNotification = useAddNotification();
+  const intl = useIntl();
 
   const { auth, getEnvironmentDetails } = useChrome();
 
@@ -45,7 +54,9 @@ const DeleteServiceAccountPage = () => {
 
       addNotification({
         variant: 'success',
-        title: `${query.data?.name} service account deleted`,
+        title: intl.formatMessage(messages.deletedNotification, {
+          name: query.data?.name,
+        }),
       });
     },
   });

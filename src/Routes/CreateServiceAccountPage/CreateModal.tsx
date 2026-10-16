@@ -18,19 +18,70 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 import React, { VoidFunctionComponent, useRef, useState } from 'react';
+import { MessageDescriptor, defineMessages, useIntl } from 'react-intl';
 import { appendTo, mergeToBasename } from '../../shared/utils';
 import { useNavigate } from 'react-router-dom';
 
 const FORM_ID = 'service-account-form';
 const MAX_SERVICE_ACCOUNT_NAME_LENGTH = 32;
 const MAX_SERVICE_ACCOUNT_DESC_LENGTH = 255;
-const HELPER_TEXT: { [key: string]: string } = {
-  'empty-name': 'Required',
-  'empty-desc': 'Required',
-  'invalid-format':
-    'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
-  'invalid-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_NAME_LENGTH} characters.`,
-  'invalid-desc-length': `Cannot exceed ${MAX_SERVICE_ACCOUNT_DESC_LENGTH} characters.`,
+
+const messages = defineMessages({
+  title: {
+    id: 'serviceAccounts.create.title',
+    defaultMessage: 'Create a service account',
+  },
+  nameLabel: {
+    id: 'serviceAccounts.create.nameLabel',
+    defaultMessage: 'Service account name',
+  },
+  namePopoverBody: {
+    id: 'serviceAccounts.create.namePopoverBody',
+    defaultMessage:
+      'Please provide a simple and short name of the service account you are creating',
+  },
+  nameAriaLabel: {
+    id: 'serviceAccounts.create.nameAriaLabel',
+    defaultMessage: 'name of service account',
+  },
+  descriptionLabel: {
+    id: 'serviceAccounts.create.descriptionLabel',
+    defaultMessage: 'Short description',
+  },
+  required: {
+    id: 'serviceAccounts.create.validation.required',
+    defaultMessage: 'Required',
+  },
+  invalidFormat: {
+    id: 'serviceAccounts.create.validation.invalidFormat',
+    defaultMessage:
+      'Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - ).',
+  },
+  invalidNameLength: {
+    id: 'serviceAccounts.create.validation.invalidNameLength',
+    defaultMessage: 'Cannot exceed {max} characters.',
+  },
+  invalidDescLength: {
+    id: 'serviceAccounts.create.validation.invalidDescLength',
+    defaultMessage: 'Cannot exceed {max} characters.',
+  },
+  createButton: {
+    id: 'serviceAccounts.create.button.create',
+    defaultMessage: 'Create',
+  },
+  cancelButton: {
+    id: 'serviceAccounts.create.button.cancel',
+    defaultMessage: 'Cancel',
+  },
+});
+
+/** Maps validation results to their helper-text message descriptors. */
+const HELPER_TEXT: Record<string, MessageDescriptor> = {
+  'empty-name': messages.required,
+  'empty-desc': messages.required,
+  'invalid-format': messages.invalidFormat,
+  'invalid-length': messages.invalidNameLength,
+  'invalid-desc-length': messages.invalidDescLength,
 };
 
 export type CreateModalProps = {
@@ -54,6 +105,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
 
   const navigate = useNavigate();
   const submitButton = useRef();
+  const intl = useIntl();
 
   const isNameValid = (name: string) => {
     if (name === undefined || name.trim() === '') {
@@ -71,12 +123,16 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
     const validationResult = isNameValid(name);
     if (validationResult === 'valid') {
       setNameValidated('success');
-      setNameHelperText(HELPER_TEXT['empty-name']);
+      setNameHelperText(intl.formatMessage(HELPER_TEXT['empty-name']));
     } else if (name !== '' || (name === '' && inputFieldBlur)) {
       setNameValidated('error');
-      setNameHelperText(HELPER_TEXT[isNameValid(name)]);
+      setNameHelperText(
+        intl.formatMessage(HELPER_TEXT[isNameValid(name)], {
+          max: MAX_SERVICE_ACCOUNT_NAME_LENGTH,
+        })
+      );
     }
-  }, [name, inputFieldBlur]);
+  }, [name, inputFieldBlur, intl]);
 
   const isDescriptionValid = (description: string) => {
     if (description === undefined || description.trim() === '') {
@@ -95,9 +151,13 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
       setDescHelperText('');
     } else if (description != '' || (description == '' && inputFieldBlur)) {
       setDescriptionValidated('error');
-      setDescHelperText(HELPER_TEXT[isDescriptionValid(description)]);
+      setDescHelperText(
+        intl.formatMessage(HELPER_TEXT[isDescriptionValid(description)], {
+          max: MAX_SERVICE_ACCOUNT_DESC_LENGTH,
+        })
+      );
     }
-  }, [description]);
+  }, [description, intl]);
 
   const onBlurHandler = () => setInputFieldBlur(true);
   const onClose = () => navigate(mergeToBasename(''));
@@ -113,7 +173,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
     <Modal
       id="modalCreateServiceAccountStep1"
       variant={ModalVariant.medium}
-      title="Create a service account"
+      title={intl.formatMessage(messages.title)}
       isOpen={true}
       onClose={onClose}
       ouiaId="modal-create-service-account"
@@ -126,19 +186,19 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           nameValidated != 'success' || descriptionValidated != 'success'
         }
       >
-        <ModalHeader title="Create a service account" />
+        <ModalHeader title={intl.formatMessage(messages.title)} />
         <ModalBody>
           <FormGroup
             isRequired
-            label="Service account name"
+            label={intl.formatMessage(messages.nameLabel)}
             fieldId="name-field"
             labelHelp={
               <Popover
-                headerContent="Service account name"
-                bodyContent="Please provide a simple and short name of the service account you are creating"
+                headerContent={intl.formatMessage(messages.nameLabel)}
+                bodyContent={intl.formatMessage(messages.namePopoverBody)}
               >
                 <Button
-                  aria-label="name of service account"
+                  aria-label={intl.formatMessage(messages.nameAriaLabel)}
                   aria-describedby="name-field"
                   className="pf-c-form__group-label-help"
                   type="button"
@@ -174,7 +234,7 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
           </FormGroup>
           <FormGroup
             isRequired
-            label="Short description"
+            label={intl.formatMessage(messages.descriptionLabel)}
             fieldId="short-description-field"
           >
             <TextInput
@@ -209,14 +269,14 @@ export const CreateModal: VoidFunctionComponent<CreateModalProps> = ({
               nameValidated !== 'success' || descriptionValidated !== 'success'
             }
           >
-            Create
+            {intl.formatMessage(messages.createButton)}
           </Button>
           <Button
             ouiaId="createmodal-cancel-button"
             variant={ButtonVariant.link}
             onClick={onClose}
           >
-            Cancel
+            {intl.formatMessage(messages.cancelButton)}
           </Button>
         </ModalFooter>
       </Form>

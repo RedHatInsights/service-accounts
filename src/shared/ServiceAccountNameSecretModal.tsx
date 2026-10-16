@@ -18,19 +18,62 @@ import {
 import { KeyIcon } from '@patternfly/react-icons';
 import ErrorState from '@patternfly/react-component-groups/dist/dynamic/ErrorState';
 import React, { VoidFunctionComponent, useState } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { NewServiceAccount } from '../types';
 import { AppLink } from './AppLink';
 import { appendTo } from './utils';
+
+const messages = defineMessages({
+  modalAriaLabel: {
+    id: 'serviceAccounts.credentials.ariaLabel',
+    defaultMessage: 'Service account credentials',
+  },
+  errorTitle: {
+    id: 'serviceAccounts.credentials.errorTitle',
+    defaultMessage: 'Credentials were not generated successfully',
+  },
+  close: {
+    id: 'serviceAccounts.credentials.button.close',
+    defaultMessage: 'Close',
+  },
+  successTitle: {
+    id: 'serviceAccounts.credentials.successTitle',
+    defaultMessage: 'Credentials successfully generated',
+  },
+  connectBody: {
+    id: 'serviceAccounts.credentials.connectBody',
+    defaultMessage:
+      'Connect to Red Hat cloud services or APIs using this client ID and secret',
+  },
+  clientId: {
+    id: 'serviceAccounts.credentials.clientId',
+    defaultMessage: 'Client ID',
+  },
+  clientSecret: {
+    id: 'serviceAccounts.credentials.clientSecret',
+    defaultMessage: 'Client secret',
+  },
+  safeCopyBody: {
+    id: 'serviceAccounts.credentials.safeCopyBody',
+    defaultMessage:
+      'Make a copy of the client ID and secret to store in a safe place. The client secret won’t appear again after closing this screen.',
+  },
+  confirmCheckbox: {
+    id: 'serviceAccounts.credentials.confirmCheckbox',
+    defaultMessage: 'I have copied the client ID and secret',
+  },
+});
 
 export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
   serviceAccount: NewServiceAccount;
 }> = ({ serviceAccount }) => {
   const [confirmationCheckbox, confirm] = useState(false);
+  const intl = useIntl();
   return (
     <Modal
       id="modalCreateServiceAccountStep2"
       variant={ModalVariant.medium}
-      aria-label="Service account credentials"
+      aria-label={intl.formatMessage(messages.modalAriaLabel)}
       isOpen
       appendTo={appendTo}
       ouiaId="modal-Credentials"
@@ -38,7 +81,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
       <ModalBody>
         {serviceAccount.error ? (
           <ErrorState
-            titleText="Credentials were not generated successfully"
+            titleText={intl.formatMessage(messages.errorTitle)}
             bodyText={serviceAccount.error_description}
             customFooter={
               <Button
@@ -47,7 +90,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 ouiaId="button-close"
                 component={(props) => <AppLink {...props} to="" />}
               >
-                Close
+                {intl.formatMessage(messages.close)}
               </Button>
             }
           />
@@ -55,7 +98,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
           <EmptyState
             headingLevel="h2"
             icon={KeyIcon}
-            titleText="Credentials successfully generated"
+            titleText={intl.formatMessage(messages.successTitle)}
           >
             <EmptyStateFooter>
               <Content>
@@ -63,8 +106,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   component={ContentVariants.small}
                   className="pf-u-mt-lg"
                 >
-                  Connect to Red Hat cloud services or APIs using this client ID
-                  and secret
+                  <FormattedMessage {...messages.connectBody} />
                 </Content>
               </Content>
               <InputGroup className="pf-u-mt-lg">
@@ -72,7 +114,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   className="pf-u-text-nowrap pf-u-flex-shrink-0"
                   style={{ minWidth: '120px', textAlign: 'left' }}
                 >
-                  Client ID
+                  {intl.formatMessage(messages.clientId)}
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
@@ -80,7 +122,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     isReadOnly
                     data-testid="modalCredentials-copyClientID"
                     ouiaId="button-copy-clientID"
-                    textAriaLabel="Client ID"
+                    textAriaLabel={intl.formatMessage(messages.clientId)}
                   >
                     {serviceAccount.clientId}
                   </ClipboardCopy>
@@ -91,7 +133,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   className="pf-u-text-nowrap pf-u-flex-shrink-0"
                   style={{ minWidth: '120px', textAlign: 'left' }}
                 >
-                  Client secret
+                  {intl.formatMessage(messages.clientSecret)}
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
@@ -99,7 +141,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     className="pf-v6-u-w-100"
                     data-testid="modalCredentials-copyClientSecret"
                     ouiaId="button-copy-clientSecret"
-                    textAriaLabel="Client secret"
+                    textAriaLabel={intl.formatMessage(messages.clientSecret)}
                   >
                     {serviceAccount.secret}
                   </ClipboardCopy>
@@ -110,14 +152,12 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   component={ContentVariants.small}
                   className="pf-u-mt-lg"
                 >
-                  Make a copy of the client ID and secret to store in a safe
-                  place. The client secret won&#39;t appear again after closing
-                  this screen.
+                  <FormattedMessage {...messages.safeCopyBody} />
                 </Content>
               </Content>
               <Bullseye className="pf-u-mt-lg">
                 <Checkbox
-                  label="I have copied the client ID and secret"
+                  label={intl.formatMessage(messages.confirmCheckbox)}
                   isChecked={confirmationCheckbox}
                   onChange={(_event, val) => confirm(val)}
                   id="check-1"
@@ -132,7 +172,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 ouiaId="button-close"
                 component={(props) => <AppLink {...props} to="" />}
               >
-                Close
+                {intl.formatMessage(messages.close)}
               </Button>
             </EmptyStateFooter>
           </EmptyState>

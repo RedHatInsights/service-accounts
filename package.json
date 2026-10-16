@@ -22,7 +22,9 @@
     "test-storybook": "test-storybook --testTimeout=30000",
     "test-storybook:fast": "CI=true test-storybook --excludeTags test-skip --testTimeout=30000",
     "test-storybook:ci": "test-storybook --ci --excludeTags test-skip --testTimeout=30000",
-    "test:playwright": "playwright test"
+    "test:playwright": "playwright test",
+    "translations:extract": "formatjs extract 'src/**/*.ts*' --out-file locales/translation-template.json",
+    "lint:translations": "npm run translations:extract && git diff --exit-code locales/translation-template.json"
   },
   "dependencies": {
     "@patternfly/react-component-groups": "^6.4.0",
@@ -38,6 +40,7 @@
     "classnames": "^2.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-intl": "^6.8.9",
     "react-router-dom": "^6.30.3"
   },
   "devDependencies": {
@@ -47,6 +50,7 @@
     "@babel/preset-env": "7.29.2",
     "@babel/preset-react": "7.28.5",
     "@babel/preset-typescript": "^7.28.5",
+    "@formatjs/cli": "^6.16.34",
     "@playwright/test": "1.59.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@redhat-cloud-services/eslint-config-redhat-cloud-services": "^1.3.0",
@@ -70,6 +74,7 @@
     "chromatic": "^13.3.5",
     "css-loader": "^7.1.4",
     "eslint": "8.57.1",
+    "eslint-plugin-i18next": "^6.1.5",
     "eslint-plugin-storybook": "^10.3.1",
     "identity-obj-proxy": "3.0.0",
     "jest": "27.5.1",

@@ -10,9 +10,33 @@ import {
   Spinner,
 } from '@patternfly/react-core';
 import React, { VoidFunctionComponent } from 'react';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { AppLink } from '../../shared/AppLink';
 import { appendTo } from '../../shared/utils';
 import { useNavigate } from 'react-router-dom';
+
+const messages = defineMessages({
+  title: {
+    id: 'serviceAccounts.reset.title',
+    defaultMessage: 'Reset service account credentials?',
+  },
+  body: {
+    id: 'serviceAccounts.reset.body',
+    defaultMessage: 'Client secret for {name} with client ID will be reset.',
+  },
+  loading: {
+    id: 'serviceAccounts.reset.loading',
+    defaultMessage: 'Loading service account information',
+  },
+  resetButton: {
+    id: 'serviceAccounts.reset.button.reset',
+    defaultMessage: 'Reset',
+  },
+  cancelButton: {
+    id: 'serviceAccounts.reset.button.cancel',
+    defaultMessage: 'Cancel',
+  },
+});
 
 export type ResetModalProps = {
   name: string | undefined;
@@ -26,27 +50,32 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
   onConfirm,
 }) => {
   const navigate = useNavigate();
+  const intl = useIntl();
   return (
     <Modal
       id="modalCreateServiceAccountReset"
       variant={ModalVariant.medium}
-      title={'Reset service account credentials?'}
+      title={intl.formatMessage(messages.title)}
       isOpen={true}
       ouiaId={'modal-reset-service-account'}
       appendTo={appendTo}
       onClose={() => navigate('')}
     >
-      <ModalHeader title="Reset service account credentials?" />
+      <ModalHeader title={intl.formatMessage(messages.title)} />
       <ModalBody>
         {name ? (
           <Content>
-            Client secret for <strong>{name || <Spinner size={'sm'} />}</strong>{' '}
-            with client ID will be reset.
+            <FormattedMessage
+              {...messages.body}
+              values={{
+                name: <strong>{name || <Spinner size={'sm'} />}</strong>,
+              }}
+            />
           </Content>
         ) : (
           <Bullseye>
             <Spinner
-              aria-label={'Loading service account information'}
+              aria-label={intl.formatMessage(messages.loading)}
               size={'xl'}
             />
           </Bullseye>
@@ -61,7 +90,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           onClick={onConfirm}
           ouiaId="resetmodal-confirm-button"
         >
-          Reset
+          {intl.formatMessage(messages.resetButton)}
         </Button>
         <Button
           key="cancel"
@@ -69,7 +98,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           component={(props) => <AppLink {...props} to={''} />}
           ouiaId="resetmodal-cancel-button"
         >
-          Cancel
+          {intl.formatMessage(messages.cancelButton)}
         </Button>
       </ModalFooter>
     </Modal>

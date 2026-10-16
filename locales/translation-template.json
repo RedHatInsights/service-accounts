@@ -1,0 +1,170 @@
+{
+  "serviceAccounts.create.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "serviceAccounts.create.button.create": {
+    "defaultMessage": "Create"
+  },
+  "serviceAccounts.create.descriptionLabel": {
+    "defaultMessage": "Short description"
+  },
+  "serviceAccounts.create.nameAriaLabel": {
+    "defaultMessage": "name of service account"
+  },
+  "serviceAccounts.create.nameLabel": {
+    "defaultMessage": "Service account name"
+  },
+  "serviceAccounts.create.namePopoverBody": {
+    "defaultMessage": "Please provide a simple and short name of the service account you are creating"
+  },
+  "serviceAccounts.create.title": {
+    "defaultMessage": "Create a service account"
+  },
+  "serviceAccounts.create.validation.invalidDescLength": {
+    "defaultMessage": "Cannot exceed {max} characters."
+  },
+  "serviceAccounts.create.validation.invalidFormat": {
+    "defaultMessage": "Must start with a letter and end with a letter or number. Valid characters include lowercase letters from a to z, numbers from 0 to 9, and hyphens ( - )."
+  },
+  "serviceAccounts.create.validation.invalidNameLength": {
+    "defaultMessage": "Cannot exceed {max} characters."
+  },
+  "serviceAccounts.create.validation.required": {
+    "defaultMessage": "Required"
+  },
+  "serviceAccounts.credentials.ariaLabel": {
+    "defaultMessage": "Service account credentials"
+  },
+  "serviceAccounts.credentials.button.close": {
+    "defaultMessage": "Close"
+  },
+  "serviceAccounts.credentials.clientId": {
+    "defaultMessage": "Client ID"
+  },
+  "serviceAccounts.credentials.clientSecret": {
+    "defaultMessage": "Client secret"
+  },
+  "serviceAccounts.credentials.confirmCheckbox": {
+    "defaultMessage": "I have copied the client ID and secret"
+  },
+  "serviceAccounts.credentials.connectBody": {
+    "defaultMessage": "Connect to Red Hat cloud services or APIs using this client ID and secret"
+  },
+  "serviceAccounts.credentials.errorTitle": {
+    "defaultMessage": "Credentials were not generated successfully"
+  },
+  "serviceAccounts.credentials.safeCopyBody": {
+    "defaultMessage": "Make a copy of the client ID and secret to store in a safe place. The client secret won’t appear again after closing this screen."
+  },
+  "serviceAccounts.credentials.successTitle": {
+    "defaultMessage": "Credentials successfully generated"
+  },
+  "serviceAccounts.delete.body": {
+    "defaultMessage": "{name} will be deleted."
+  },
+  "serviceAccounts.delete.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "serviceAccounts.delete.button.delete": {
+    "defaultMessage": "Delete"
+  },
+  "serviceAccounts.delete.loading": {
+    "defaultMessage": "Loading service account information"
+  },
+  "serviceAccounts.delete.notification": {
+    "defaultMessage": "{name} service account deleted"
+  },
+  "serviceAccounts.delete.title": {
+    "defaultMessage": "Delete service account?"
+  },
+  "serviceAccounts.empty.body": {
+    "defaultMessage": "To get started, create a service account."
+  },
+  "serviceAccounts.empty.createButton": {
+    "defaultMessage": "Create service account"
+  },
+  "serviceAccounts.empty.title": {
+    "defaultMessage": "No service accounts yet"
+  },
+  "serviceAccounts.list.description": {
+    "defaultMessage": "Use service accounts to securely and automatically connect and authenticate services or applications without requiring an end user’s credentials or direct interaction."
+  },
+  "serviceAccounts.list.learnMore": {
+    "defaultMessage": "Watch a video to learn more"
+  },
+  "serviceAccounts.list.title": {
+    "defaultMessage": "Service Accounts"
+  },
+  "serviceAccounts.reset.body": {
+    "defaultMessage": "Client secret for {name} with client ID will be reset."
+  },
+  "serviceAccounts.reset.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "serviceAccounts.reset.button.reset": {
+    "defaultMessage": "Reset"
+  },
+  "serviceAccounts.reset.loading": {
+    "defaultMessage": "Loading service account information"
+  },
+  "serviceAccounts.reset.title": {
+    "defaultMessage": "Reset service account credentials?"
+  },
+  "serviceAccounts.table.action.delete": {
+    "defaultMessage": "Delete service account"
+  },
+  "serviceAccounts.table.action.resetCredentials": {
+    "defaultMessage": "Reset credentials"
+  },
+  "serviceAccounts.table.ariaLabel": {
+    "defaultMessage": "List of created service accounts"
+  },
+  "serviceAccounts.table.column.actionsSr": {
+    "defaultMessage": "Actions"
+  },
+  "serviceAccounts.table.column.clientId": {
+    "defaultMessage": "Client ID"
+  },
+  "serviceAccounts.table.column.description": {
+    "defaultMessage": "Description"
+  },
+  "serviceAccounts.table.column.name": {
+    "defaultMessage": "Name"
+  },
+  "serviceAccounts.table.column.owner": {
+    "defaultMessage": "Owner"
+  },
+  "serviceAccounts.table.column.timeCreated": {
+    "defaultMessage": "Time created"
+  },
+  "serviceAccounts.table.createButton": {
+    "defaultMessage": "Create service account"
+  },
+  "serviceAccounts.table.empty.body": {
+    "defaultMessage": "No service accounts found."
+  },
+  "serviceAccounts.table.empty.clearFilters": {
+    "defaultMessage": "Clear all filters"
+  },
+  "serviceAccounts.table.empty.filteredBody": {
+    "defaultMessage": "No results match the filter criteria. Clear all filters and try again."
+  },
+  "serviceAccounts.table.empty.title": {
+    "defaultMessage": "No results found"
+  },
+  "serviceAccounts.table.filter.clientIdPlaceholder": {
+    "defaultMessage": "Filter by client ID"
+  },
+  "serviceAccounts.table.filter.namePlaceholder": {
+    "defaultMessage": "Filter by name"
+  },
+  "serviceAccounts.table.filter.ownerPlaceholder": {
+    "defaultMessage": "Filter by owner"
+  },
+  "serviceAccounts.table.pagination.many": {
+    "defaultMessage": "many"
+  },
+  "serviceAccounts.table.pagination.of": {
+    "defaultMessage": "of"
+  }
+}

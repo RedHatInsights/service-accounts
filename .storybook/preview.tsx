@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import { FeatureFlagsProvider, StorybookMockProvider } from '@redhat-cloud-services/hcc-storybook-hub';
+import { IntlMessagesProvider } from '../src/shared/i18n';
 
 // PatternFly 6 styles
 import '@patternfly/react-core/dist/styles/base.css';
@@ -80,7 +81,9 @@ const preview: Preview = {
         return (
           <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
             <FeatureFlagsProvider value={featureFlags}>
-              <Story />
+              <IntlMessagesProvider locale="en">
+                <Story />
+              </IntlMessagesProvider>
             </FeatureFlagsProvider>
           </StorybookMockProvider>
         );
@@ -89,11 +92,13 @@ const preview: Preview = {
       return (
         <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
           <FeatureFlagsProvider value={featureFlags}>
-            <QueryClientProvider client={queryClient}>
-              <MemoryRouter>
-                <Story />
-              </MemoryRouter>
-            </QueryClientProvider>
+            <IntlMessagesProvider locale="en">
+              <QueryClientProvider client={queryClient}>
+                <MemoryRouter>
+                  <Story />
+                </MemoryRouter>
+              </QueryClientProvider>
+            </IntlMessagesProvider>
           </FeatureFlagsProvider>
         </StorybookMockProvider>
       );
