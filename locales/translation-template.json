@@ -83,8 +83,17 @@
   "serviceAccounts.empty.createButton": {
     "defaultMessage": "Create service account"
   },
+  "serviceAccounts.empty.createTokenButton": {
+    "defaultMessage": "Create service access token"
+  },
   "serviceAccounts.empty.title": {
     "defaultMessage": "No service accounts yet"
+  },
+  "serviceAccounts.empty.tokenBody": {
+    "defaultMessage": "Create a service account or a service access token to get started."
+  },
+  "serviceAccounts.empty.tokenTitle": {
+    "defaultMessage": "No service accounts or service access tokens yet"
   },
   "serviceAccounts.list.description": {
     "defaultMessage": "Use service accounts to securely and automatically connect and authenticate services or applications without requiring an end user’s credentials or direct interaction."
