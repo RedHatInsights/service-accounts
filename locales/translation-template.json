@@ -123,7 +123,7 @@
     "defaultMessage": "Actions"
   },
   "serviceAccounts.table.column.clientId": {
-    "defaultMessage": "Client ID"
+    "defaultMessage": "Client ID / Username"
   },
   "serviceAccounts.table.column.description": {
     "defaultMessage": "Description"
@@ -153,7 +153,7 @@
     "defaultMessage": "No results found"
   },
   "serviceAccounts.table.filter.clientIdPlaceholder": {
-    "defaultMessage": "Filter by client ID"
+    "defaultMessage": "Filter by client ID or username"
   },
   "serviceAccounts.table.filter.namePlaceholder": {
     "defaultMessage": "Filter by name"

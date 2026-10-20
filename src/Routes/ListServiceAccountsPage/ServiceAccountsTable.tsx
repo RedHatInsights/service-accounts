@@ -73,7 +73,7 @@ const messages = defineMessages({
   },
   columnClientId: {
     id: 'serviceAccounts.table.column.clientId',
-    defaultMessage: 'Client ID',
+    defaultMessage: 'Client ID / Username',
   },
   columnOwner: {
     id: 'serviceAccounts.table.column.owner',
@@ -93,7 +93,7 @@ const messages = defineMessages({
   },
   filterClientIdPlaceholder: {
     id: 'serviceAccounts.table.filter.clientIdPlaceholder',
-    defaultMessage: 'Filter by client ID',
+    defaultMessage: 'Filter by client ID or username',
   },
   filterOwnerPlaceholder: {
     id: 'serviceAccounts.table.filter.ownerPlaceholder',

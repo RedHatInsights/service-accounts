@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { expect, within } from 'storybook/test';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 import { ServiceAccount } from '../../types';
 
@@ -98,6 +99,13 @@ export const Default: Story = {
     serviceAccounts: mockServiceAccounts,
     hasMore: false,
     isLoading: false,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(
+      canvas.getByRole('columnheader', { name: 'Client ID / Username' })
+    ).toBeInTheDocument();
+    expect(canvas.getByText('client-abc-123')).toBeInTheDocument();
   },
 };
 
