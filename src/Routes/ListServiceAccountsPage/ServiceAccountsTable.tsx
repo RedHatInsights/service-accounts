@@ -41,7 +41,6 @@ import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome'
 import { ChromeUser } from '@redhat-cloud-services/types';
 import { useFlag } from '@unleash/proxy-client-react';
 import { defineMessages, useIntl } from 'react-intl';
-import { AppLink } from '../../shared/AppLink';
 import { mergeToBasename } from '../../shared/utils';
 import { ServiceAccount } from '../../types';
 import { SortByField, SortOrder } from '../../shared/fetchServiceAccounts';
@@ -61,6 +60,7 @@ import {
   createFiltersParamsUpdater,
   createSortParamsUpdater,
 } from './urlParams';
+import { CreateCredentialButton } from './CreateCredentialButton';
 
 const messages = defineMessages({
   columnName: {
@@ -98,10 +98,6 @@ const messages = defineMessages({
   filterOwnerPlaceholder: {
     id: 'serviceAccounts.table.filter.ownerPlaceholder',
     defaultMessage: 'Filter by owner',
-  },
-  createButton: {
-    id: 'serviceAccounts.table.createButton',
-    defaultMessage: 'Create service account',
   },
   tableAriaLabel: {
     id: 'serviceAccounts.table.ariaLabel',
@@ -148,11 +144,18 @@ export interface ServiceAccountsTableProps {
   hasMore?: boolean;
   isLoading: boolean;
   onParamsChange?: () => void;
+  onCreateToken?: () => void;
 }
 
 export const ServiceAccountsTable: FunctionComponent<
   ServiceAccountsTableProps
-> = ({ serviceAccounts, itemCount, hasMore = false, isLoading }) => {
+> = ({
+  serviceAccounts,
+  itemCount,
+  hasMore = false,
+  isLoading,
+  onCreateToken,
+}) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { auth, getUserPermissions } = useChrome();
@@ -471,14 +474,7 @@ export const ServiceAccountsTable: FunctionComponent<
         actions={
           <ToolbarGroup>
             <ToolbarItem>
-              <Button
-                ouiaId={`${OUIA_ID}-create-button`}
-                component={(props) => (
-                  <AppLink {...props} to="create">
-                    {intl.formatMessage(messages.createButton)}
-                  </AppLink>
-                )}
-              />
+              <CreateCredentialButton onCreateToken={onCreateToken} />
             </ToolbarItem>
           </ToolbarGroup>
         }

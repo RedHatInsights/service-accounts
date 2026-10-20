@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 import { ServiceAccount } from '../../types';
 
@@ -98,6 +99,23 @@ export const Default: Story = {
     serviceAccounts: mockServiceAccounts,
     hasMore: false,
     isLoading: false,
+  },
+};
+
+export const CreateNewChoices: Story = {
+  args: {
+    serviceAccounts: mockServiceAccounts,
+    hasMore: false,
+    isLoading: false,
+    onCreateToken: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Create new' }));
+    const page = within(document.body);
+    expect(page.getByText('Service account')).toBeInTheDocument();
+    await userEvent.click(page.getByText('Service access token'));
+    expect(args.onCreateToken).toHaveBeenCalledTimes(1);
   },
 };
 
