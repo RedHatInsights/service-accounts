@@ -20,6 +20,7 @@ export default meta;
 type Story = StoryObj<typeof EmptyStateNoServiceAccounts>;
 
 export const BothCreationChoices: Story = {
+  globals: { satFlag: 'enabled' },
   args: { onCreateToken: fn() },
   play: async ({ canvasElement, args }) => {
     const page = within(canvasElement);
@@ -33,5 +34,19 @@ export const BothCreationChoices: Story = {
       page.getByRole('button', { name: 'Create service access token' })
     );
     expect(args.onCreateToken).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const SatFlagDisabled: Story = {
+  args: { onCreateToken: fn() },
+  play: async ({ canvasElement }) => {
+    const page = within(canvasElement);
+    expect(page.getByText('No service accounts yet')).toBeInTheDocument();
+    expect(
+      page.getByRole('link', { name: 'Create service account' })
+    ).toBeInTheDocument();
+    expect(
+      page.queryByRole('button', { name: 'Create service access token' })
+    ).not.toBeInTheDocument();
   },
 };

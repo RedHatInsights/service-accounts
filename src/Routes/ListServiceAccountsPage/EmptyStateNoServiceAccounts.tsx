@@ -6,6 +6,7 @@ import {
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
+import { useFlag } from '@unleash/proxy-client-react';
 import type { FunctionComponent } from 'react';
 import React from 'react';
 import { FormattedMessage, defineMessages } from 'react-intl';
@@ -42,20 +43,23 @@ const messages = defineMessages({
 export const EmptyStateNoServiceAccounts: FunctionComponent<{
   onCreateToken?: () => void;
 }> = ({ onCreateToken }) => {
+  const isSatEnabled = useFlag('platform.service-accounts.sat');
+  const showTokenChoice = isSatEnabled && !!onCreateToken;
+
   return (
     <EmptyState
       headingLevel="h2"
       icon={PlusCircleIcon}
       titleText={
         <FormattedMessage
-          {...(onCreateToken ? messages.tokenTitle : messages.title)}
+          {...(showTokenChoice ? messages.tokenTitle : messages.title)}
         />
       }
       variant={EmptyStateVariant.xs}
     >
       <EmptyStateBody>
         <FormattedMessage
-          {...(onCreateToken ? messages.tokenBody : messages.body)}
+          {...(showTokenChoice ? messages.tokenBody : messages.body)}
         />
       </EmptyStateBody>
       <EmptyStateFooter>
@@ -66,7 +70,7 @@ export const EmptyStateNoServiceAccounts: FunctionComponent<{
         >
           <FormattedMessage {...messages.createButton} />
         </Button>
-        {onCreateToken && (
+        {showTokenChoice && (
           <Button
             ouiaId="button-create-token"
             variant="secondary"
