@@ -307,6 +307,45 @@ export const Default: Story = {
   },
 };
 
+export const InitialEmptyState: Story = {
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('No service accounts yet')).toBeInTheDocument()
+    );
+    expect(canvas.getByText('Create service account')).toBeInTheDocument();
+  },
+};
+
+export const FilteredNoResults: Story = {
+  args: { initialRoute: '/iam/service-accounts?name=missing' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers(mockServiceAccounts),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('No results found')).toBeInTheDocument()
+    );
+    expect(
+      canvas.getByText(/No results match the filter criteria/)
+    ).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getAllByRole('button', { name: 'Clear all filters' })[0]
+    );
+    await waitFor(() =>
+      expect(canvas.getByText('my-api-service')).toBeInTheDocument()
+    );
+  },
+};
+
 export const CreateServiceAccountJourney: Story = {
   parameters: {
     msw: {
