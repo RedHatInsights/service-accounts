@@ -6,6 +6,7 @@ import {
   MenuToggle,
 } from '@patternfly/react-core';
 import React, { FunctionComponent, useState } from 'react';
+import { useFlag } from '@unleash/proxy-client-react';
 import { defineMessages, useIntl } from 'react-intl';
 import { AppLink } from '../../shared/AppLink';
 
@@ -33,9 +34,10 @@ export const CreateCredentialButton: FunctionComponent<{
   onCreateToken?: () => void;
 }> = ({ onCreateToken }) => {
   const intl = useIntl();
+  const isSatEnabled = useFlag('platform.service-accounts.sat');
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!onCreateToken) {
+  if (!isSatEnabled || !onCreateToken) {
     return (
       <Button
         ouiaId="service-accounts-table-create-button"

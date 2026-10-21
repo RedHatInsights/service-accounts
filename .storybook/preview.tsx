@@ -67,6 +67,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    satFlag: {
+      name: 'Service access tokens',
+      description: 'Enable/disable service access token features',
+      defaultValue: 'disabled',
+      toolbar: {
+        icon: 'key',
+        items: [
+          { value: 'enabled', title: 'SAT Enabled' },
+          { value: 'disabled', title: 'SAT Disabled' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
@@ -74,6 +87,7 @@ const preview: Preview = {
       const featureFlags = {
         'platform.service-accounts.sorting': context.globals.sortingFlag !== 'disabled',
         'platform.service-accounts.filtering': context.globals.filteringFlag !== 'disabled',
+        'platform.service-accounts.sat': context.globals.satFlag === 'enabled',
       };
 
       // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
