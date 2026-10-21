@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { expect, within } from 'storybook/test';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 import { ServiceAccount } from '../../types';
 
@@ -94,10 +95,35 @@ type Story = StoryObj<typeof ServiceAccountsTable>;
  * Pagination is automatically synced with URL parameters via useDataViewPagination hook.
  */
 export const Default: Story = {
+  globals: { satFlag: 'enabled' },
   args: {
     serviceAccounts: mockServiceAccounts,
     hasMore: false,
     isLoading: false,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(
+      canvas.getByRole('columnheader', { name: 'Client ID / Username' })
+    ).toBeInTheDocument();
+    expect(canvas.getByText('client-abc-123')).toBeInTheDocument();
+  },
+};
+
+export const SatFlagDisabled: Story = {
+  args: {
+    serviceAccounts: mockServiceAccounts,
+    hasMore: false,
+    isLoading: false,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(
+      canvas.getByRole('columnheader', { name: 'Client ID' })
+    ).toBeInTheDocument();
+    expect(
+      canvas.queryByRole('columnheader', { name: 'Client ID / Username' })
+    ).not.toBeInTheDocument();
   },
 };
 
