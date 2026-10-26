@@ -14,10 +14,8 @@ export const SERVICE_ACCOUNTS_URL = '/iam/service-accounts';
  */
 export async function disableCookiePrompt(page: Page): Promise<void> {
   await page.route('**/*', async (route, request) => {
-    if (
-      request.url().includes('consent.trustarc.com') &&
-      request.resourceType() !== 'document'
-    ) {
+    const hostname = new URL(request.url()).hostname;
+    if (hostname === 'trustarc.com' || hostname.endsWith('.trustarc.com')) {
       await route.abort();
     } else {
       await route.continue();
@@ -39,8 +37,6 @@ export async function login(
     'proxy config incorrect'
   ).toHaveCount(0);
 
-  await disableCookiePrompt(page);
-
   await page.getByLabel('Red Hat login').first().fill(user);
   await page.getByRole('button', { name: 'Next' }).click();
 
@@ -55,6 +51,7 @@ export async function login(
  * and performs SSO login only when needed.
  */
 export async function ensureLoggedIn(page: Page): Promise<void> {
+  await disableCookiePrompt(page);
   await page.goto('/', { waitUntil: 'load', timeout: 60000 });
 
   const loggedIn = await page.getByText('Hi,').isVisible();
