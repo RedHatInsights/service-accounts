@@ -111,6 +111,7 @@ export const Default: Story = {
 };
 
 export const SatFlagDisabled: Story = {
+  globals: { satFlag: 'disabled' },
   args: {
     serviceAccounts: mockServiceAccounts,
     hasMore: false,
