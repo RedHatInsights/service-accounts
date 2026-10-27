@@ -32,6 +32,15 @@
   "serviceAccounts.create.validation.required": {
     "defaultMessage": "Required"
   },
+  "serviceAccounts.createNew": {
+    "defaultMessage": "Create new"
+  },
+  "serviceAccounts.createNew.serviceAccessToken": {
+    "defaultMessage": "Service access token"
+  },
+  "serviceAccounts.createNew.serviceAccount": {
+    "defaultMessage": "Service account"
+  },
   "serviceAccounts.credentials.ariaLabel": {
     "defaultMessage": "Service account credentials"
   },
@@ -181,5 +190,41 @@
   },
   "serviceAccounts.table.pagination.of": {
     "defaultMessage": "of"
+  },
+  "serviceAccounts.token.create.button": {
+    "defaultMessage": "Create"
+  },
+  "serviceAccounts.token.create.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "serviceAccounts.token.create.description": {
+    "defaultMessage": "Short description"
+  },
+  "serviceAccounts.token.create.error": {
+    "defaultMessage": "The service access token could not be created. Try again."
+  },
+  "serviceAccounts.token.create.name": {
+    "defaultMessage": "Name"
+  },
+  "serviceAccounts.token.create.title": {
+    "defaultMessage": "Create a service access token"
+  },
+  "serviceAccounts.token.credentials.acknowledge": {
+    "defaultMessage": "I have copied the username and token"
+  },
+  "serviceAccounts.token.credentials.close": {
+    "defaultMessage": "Close"
+  },
+  "serviceAccounts.token.credentials.oneTime": {
+    "defaultMessage": "Copy the username and token now. The token will not be shown again after you close this window."
+  },
+  "serviceAccounts.token.credentials.success": {
+    "defaultMessage": "Service access token created"
+  },
+  "serviceAccounts.token.credentials.token": {
+    "defaultMessage": "Token"
+  },
+  "serviceAccounts.token.credentials.username": {
+    "defaultMessage": "Username"
   }
 }
