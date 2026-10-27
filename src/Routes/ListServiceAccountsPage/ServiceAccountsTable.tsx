@@ -75,6 +75,10 @@ const messages = defineMessages({
     id: 'serviceAccounts.table.column.clientId',
     defaultMessage: 'Client ID',
   },
+  columnClientIdOrUsername: {
+    id: 'serviceAccounts.table.column.clientIdOrUsername',
+    defaultMessage: 'Client ID / Username',
+  },
   columnOwner: {
     id: 'serviceAccounts.table.column.owner',
     defaultMessage: 'Owner',
@@ -94,6 +98,10 @@ const messages = defineMessages({
   filterClientIdPlaceholder: {
     id: 'serviceAccounts.table.filter.clientIdPlaceholder',
     defaultMessage: 'Filter by client ID',
+  },
+  filterClientIdOrUsernamePlaceholder: {
+    id: 'serviceAccounts.table.filter.clientIdOrUsernamePlaceholder',
+    defaultMessage: 'Filter by client ID or username',
   },
   filterOwnerPlaceholder: {
     id: 'serviceAccounts.table.filter.ownerPlaceholder',
@@ -160,6 +168,7 @@ export const ServiceAccountsTable: FunctionComponent<
 
   const isSortingEnabled = useFlag('platform.service-accounts.sorting');
   const isFilteringEnabled = useFlag('platform.service-accounts.filtering');
+  const isSatEnabled = useFlag('platform.service-accounts.sat');
 
   const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | undefined>();
   const [isRbacAdmin, setIsRbacAdmin] = useState<boolean | undefined>();
@@ -366,7 +375,11 @@ export const ServiceAccountsTable: FunctionComponent<
         cell: intl.formatMessage(messages.columnDescription),
         props: { sort: getSortParams(1) },
       },
-      intl.formatMessage(messages.columnClientId),
+      intl.formatMessage(
+        isSatEnabled
+          ? messages.columnClientIdOrUsername
+          : messages.columnClientId
+      ),
       intl.formatMessage(messages.columnOwner),
       {
         cell: intl.formatMessage(messages.columnTimeCreated),
@@ -379,7 +392,7 @@ export const ServiceAccountsTable: FunctionComponent<
         },
       },
     ],
-    [getSortParams, intl]
+    [getSortParams, intl, isSatEnabled]
   );
 
   const columnCount = columns.length;
@@ -450,9 +463,15 @@ export const ServiceAccountsTable: FunctionComponent<
               />
               <DataViewTextFilter
                 filterId="clientId"
-                title={intl.formatMessage(messages.columnClientId)}
+                title={intl.formatMessage(
+                  isSatEnabled
+                    ? messages.columnClientIdOrUsername
+                    : messages.columnClientId
+                )}
                 placeholder={intl.formatMessage(
-                  messages.filterClientIdPlaceholder
+                  isSatEnabled
+                    ? messages.filterClientIdOrUsernamePlaceholder
+                    : messages.filterClientIdPlaceholder
                 )}
                 ouiaId={`${OUIA_ID}-filter-clientId`}
               />

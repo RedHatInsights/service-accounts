@@ -134,6 +134,9 @@
   "serviceAccounts.table.column.clientId": {
     "defaultMessage": "Client ID"
   },
+  "serviceAccounts.table.column.clientIdOrUsername": {
+    "defaultMessage": "Client ID / Username"
+  },
   "serviceAccounts.table.column.description": {
     "defaultMessage": "Description"
   },
@@ -160,6 +163,9 @@
   },
   "serviceAccounts.table.empty.title": {
     "defaultMessage": "No results found"
+  },
+  "serviceAccounts.table.filter.clientIdOrUsernamePlaceholder": {
+    "defaultMessage": "Filter by client ID or username"
   },
   "serviceAccounts.table.filter.clientIdPlaceholder": {
     "defaultMessage": "Filter by client ID"
