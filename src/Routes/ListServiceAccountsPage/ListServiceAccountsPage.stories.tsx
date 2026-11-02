@@ -347,11 +347,16 @@ export const CreateServiceAccessTokenJourney: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Create new' }));
     await userEvent.click(page.getByText('Service access token'));
 
-    const create = page.getByRole('button', { name: 'Create' });
+    const modal = within(
+      await page.findByRole('dialog', {
+        name: 'Create a service access token',
+      })
+    );
+    const create = modal.getByRole('button', { name: 'Create' });
     expect(create).toBeDisabled();
-    await userEvent.type(page.getByLabelText('Name'), 'build-token');
+    await userEvent.type(modal.getByLabelText(/^Name/), 'build-token');
     await userEvent.type(
-      page.getByLabelText('Short description'),
+      modal.getByLabelText(/^Short description/),
       'Build access'
     );
     await userEvent.click(create);
