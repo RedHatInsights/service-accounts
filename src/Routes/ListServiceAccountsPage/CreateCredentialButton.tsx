@@ -30,7 +30,6 @@ const messages = defineMessages({
 });
 
 export const CreateCredentialButton: FunctionComponent<{
-  // shortcut: Keep SAT creation hidden until CIAM-12575 defines the API contract and the permission guard is ready.
   onCreateToken?: () => void;
 }> = ({ onCreateToken }) => {
   const intl = useIntl();

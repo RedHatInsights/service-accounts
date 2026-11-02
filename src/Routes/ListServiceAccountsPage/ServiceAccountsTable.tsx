@@ -355,11 +355,14 @@ export const ServiceAccountsTable: FunctionComponent<
         row: [
           sa.name,
           sa.description,
-          sa.clientId,
+          sa.serviceAccessTokenId ?? sa.clientId,
           sa.createdBy,
           <DateFormat key={`date-${sa.id}`} date={sa.createdAt * 1000} />,
           {
-            cell: <ActionsColumn items={getRowActions(sa)} />,
+            cell:
+              sa.type === 'service_access_token' ? null : (
+                <ActionsColumn items={getRowActions(sa)} />
+              ),
             props: { isActionCell: true },
           },
         ],
