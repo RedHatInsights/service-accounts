@@ -46,7 +46,7 @@ export async function createServiceAccessToken({
     );
   }
 
-  const data: unknown = await response.json();
+  const data: unknown = await response.json().catch(() => null);
   if (
     !data ||
     typeof data !== 'object' ||

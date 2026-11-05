@@ -79,4 +79,17 @@ describe('createServiceAccessToken', () => {
       'Unexpected service access token response'
     );
   });
+
+  it('treats unreadable successful responses as unexpected', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => {
+        throw new SyntaxError('Unexpected end of JSON input');
+      },
+    });
+
+    await expect(createServiceAccessToken(options)).rejects.toThrow(
+      'Unexpected service access token response'
+    );
+  });
 });
