@@ -24,7 +24,8 @@
     "test-storybook:ci": "test-storybook --ci --excludeTags test-skip --testTimeout=30000",
     "test:playwright": "playwright test",
     "translations:extract": "formatjs extract 'src/**/*.ts*' --ignore '**/*.stories.*' --ignore '**/*.test.*' --out-file locales/translation-template.json",
-    "lint:translations": "npm run translations:extract && git diff --exit-code locales/translation-template.json"
+    "lint:translations": "npm run translations:extract && git diff --exit-code locales/translation-template.json",
+    "translations:validate": "i18n-pipeline validate-ci --mode error --config .github/i18n/catalog-validation.json"
   },
   "dependencies": {
     "@patternfly/react-component-groups": "^6.4.0",
