@@ -26,5 +26,10 @@ export const SORT_FIELD_TO_INDEX: Record<SortByField, number> = {
 export const DEFAULT_SORT_FIELD: SortByField = 'name';
 export const DEFAULT_SORT_ORDER: SortOrder = 'asc';
 
-export const FILTER_KEYS = ['name', 'clientId', 'creator'] as const;
+/** Text-input filter keys (debounced). */
+export const TEXT_FILTER_KEYS = ['name', 'clientId', 'creator'] as const;
+export type TextFilterKey = (typeof TEXT_FILTER_KEYS)[number];
+
+/** All filter keys including select-type filters (used for URL params). */
+export const FILTER_KEYS = [...TEXT_FILTER_KEYS, 'type'] as const;
 export type FilterKey = (typeof FILTER_KEYS)[number];

@@ -7,6 +7,7 @@ export type ServiceAccountFilters = {
   name?: string;
   clientId?: string;
   creator?: string;
+  type?: string;
 };
 
 type Options = {
@@ -46,6 +47,9 @@ export function buildQueryParams(options: {
   }
   if (options.filters?.creator) {
     params.set('creator', options.filters.creator);
+  }
+  if (options.filters?.type) {
+    params.set('type', options.filters.type);
   }
 
   return params.toString();

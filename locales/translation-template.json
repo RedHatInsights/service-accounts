@@ -185,6 +185,12 @@
   "serviceAccounts.table.filter.ownerPlaceholder": {
     "defaultMessage": "Filter by owner"
   },
+  "serviceAccounts.table.filter.typePlaceholder": {
+    "defaultMessage": "Filter by type"
+  },
+  "serviceAccounts.table.filter.typeTitle": {
+    "defaultMessage": "Type"
+  },
   "serviceAccounts.table.pagination.many": {
     "defaultMessage": "many"
   },

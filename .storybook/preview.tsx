@@ -80,6 +80,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    typeFilteringFlag: {
+      name: 'Type filtering',
+      description: 'Enable/disable type filter for service accounts',
+      defaultValue: 'disabled',
+      toolbar: {
+        icon: 'category',
+        items: [
+          { value: 'enabled', title: 'Type Filtering Enabled' },
+          { value: 'disabled', title: 'Type Filtering Disabled' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, context) => {
@@ -88,6 +101,7 @@ const preview: Preview = {
         'platform.service-accounts.sorting': context.globals.sortingFlag !== 'disabled',
         'platform.service-accounts.filtering': context.globals.filteringFlag !== 'disabled',
         'platform.service-accounts.sat': context.globals.satFlag === 'enabled',
+        'platform.service-accounts.type-filtering': context.globals.typeFilteringFlag === 'enabled',
       };
 
       // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
