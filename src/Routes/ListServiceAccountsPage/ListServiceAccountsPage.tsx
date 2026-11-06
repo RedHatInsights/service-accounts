@@ -18,6 +18,7 @@ import {
   fetchServiceAccounts,
 } from '../../shared/fetchServiceAccounts';
 import { createServiceAccessToken } from '../../shared/createServiceAccessToken';
+import { isValidServiceAccountType } from '../../shared/serviceAccountTypes';
 import { CreateServiceAccessTokenFlow } from '../CreateServiceAccessTokenPage/CreateServiceAccessTokenFlow';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
@@ -60,17 +61,34 @@ const ListServiceAccountsPage = () => {
   const filterName = searchParams.get('name') || '';
   const filterClientId = searchParams.get('clientId') || '';
   const filterCreator = searchParams.get('creator') || '';
+  const filterTypeRaw = searchParams.get('type') || '';
+
+  const isTypeFilteringEnabled = useFlag(
+    'platform.service-accounts.type-filtering'
+  );
+
+  // Only include the type param when the flag is on AND the value is valid.
+  const filterType =
+    isTypeFilteringEnabled && isValidServiceAccountType(filterTypeRaw)
+      ? filterTypeRaw
+      : '';
 
   const filters = useMemo(
     () => ({
       ...(filterName && { name: filterName }),
       ...(filterClientId && { clientId: filterClientId }),
       ...(filterCreator && { creator: filterCreator }),
+      ...(filterType && { type: filterType }),
     }),
-    [filterName, filterClientId, filterCreator]
+    [filterName, filterClientId, filterCreator, filterType]
   );
 
-  const hasActiveFilters = !!(filterName || filterClientId || filterCreator);
+  const hasActiveFilters = !!(
+    filterName ||
+    filterClientId ||
+    filterCreator ||
+    filterType
+  );
 
   const queryClient = useQueryClient();
   const createToken = async (name: string, description: string) => {
