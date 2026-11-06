@@ -816,9 +816,9 @@ export const TypeFilterClearAll: Story = {
     // Only service accounts visible initially
     expect(canvas.queryByText('deploy-token')).not.toBeInTheDocument();
 
-    // Click "Clear all filters"
+    // Click "Clear filters" (toolbar button rendered by DataViewToolbar)
     await userEvent.click(
-      canvas.getAllByRole('button', { name: 'Clear all filters' })[0]
+      canvas.getAllByRole('button', { name: 'Clear filters' })[0]
     );
 
     // All accounts now visible
