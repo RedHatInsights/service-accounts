@@ -9,6 +9,10 @@ import CreateServiceAccountPage from '../CreateServiceAccountPage/CreateServiceA
 import DeleteServiceAccountPage from '../DeleteServiceAccountPage/DeleteServiceAccountPage';
 import ResetServiceAccountPage from '../ResetServiceAccountPage/ResetServiceAccountPage';
 import { NewServiceAccount, ServiceAccount } from '../../types';
+import {
+  SERVICE_ACCOUNT_TYPES,
+  ServiceAccountTypeValue,
+} from '../../shared/serviceAccountTypes';
 
 async function waitForStoryReady(canvas: ReturnType<typeof within>) {
   await waitFor(
@@ -52,7 +56,25 @@ async function waitForModalClose() {
   );
 }
 
-const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
+/**
+ * Extended service account type for MSW mocking.  The `saType` field is
+ * used internally by the mock handler to simulate server-side type
+ * filtering.  It is stripped from responses so the shape matches the
+ * real API (no discriminator field today).
+ */
+type MockServiceAccount = ServiceAccount & {
+  saType?: ServiceAccountTypeValue;
+};
+
+const stripMockFields = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  saType: _saType,
+  ...rest
+}: MockServiceAccount): ServiceAccount => rest;
+
+const createStatefulHandlers = (
+  initialServiceAccounts: MockServiceAccount[]
+) => {
   let serviceAccounts = [...initialServiceAccounts];
 
   return [
@@ -67,7 +89,7 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
       const sa = serviceAccounts.find((s) => s.id === id || s.clientId === id);
 
       if (sa) {
-        return HttpResponse.json(sa);
+        return HttpResponse.json(stripMockFields(sa));
       }
       return new HttpResponse(null, { status: 404 });
     }),
@@ -83,6 +105,7 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
       const filterName = url.searchParams.get('name')?.toLowerCase();
       const filterClientId = url.searchParams.get('clientId')?.toLowerCase();
       const filterCreator = url.searchParams.get('creator')?.toLowerCase();
+      const filterType = url.searchParams.get('type') || '';
 
       let filteredAccounts = [...serviceAccounts];
 
@@ -99,6 +122,11 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
       if (filterCreator) {
         filteredAccounts = filteredAccounts.filter((sa) =>
           sa.createdBy.toLowerCase().includes(filterCreator)
+        );
+      }
+      if (filterType && filterType in SERVICE_ACCOUNT_TYPES) {
+        filteredAccounts = filteredAccounts.filter(
+          (sa) => sa.saType === filterType
         );
       }
 
@@ -133,7 +161,9 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
         return 0;
       });
 
-      const result = filteredAccounts.slice(first, first + max);
+      const result = filteredAccounts
+        .slice(first, first + max)
+        .map(stripMockFields);
       return HttpResponse.json(result);
     }),
 
@@ -188,7 +218,7 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
   ];
 };
 
-const mockServiceAccounts: ServiceAccount[] = [
+const mockServiceAccounts: MockServiceAccount[] = [
   {
     id: 'sa-001',
     clientId: 'client-abc-123',
@@ -196,6 +226,7 @@ const mockServiceAccounts: ServiceAccount[] = [
     createdBy: 'john.doe',
     name: 'my-api-service',
     description: 'Production API connector',
+    saType: 'service_account',
   },
   {
     id: 'sa-002',
@@ -204,6 +235,7 @@ const mockServiceAccounts: ServiceAccount[] = [
     createdBy: 'jane.smith',
     name: 'data-pipeline',
     description: 'ETL pipeline service account',
+    saType: 'service_account',
   },
   {
     id: 'sa-003',
@@ -212,6 +244,7 @@ const mockServiceAccounts: ServiceAccount[] = [
     createdBy: 'bob.wilson',
     name: 'monitoring-agent',
     description: 'System monitoring service',
+    saType: 'service_access_token',
   },
 ];
 
@@ -648,5 +681,229 @@ export const ResetServiceAccountJourney: Story = {
       },
       { timeout: 15000 }
     );
+  },
+};
+
+// ---------- Type-filter stories ----------
+
+/** Mock data with a mix of service accounts and service access tokens. */
+const mixedTypeMockAccounts: MockServiceAccount[] = [
+  {
+    id: 'sa-001',
+    clientId: 'client-abc-123',
+    createdAt: 1704067200,
+    createdBy: 'john.doe',
+    name: 'my-api-service',
+    description: 'Production API connector',
+    saType: 'service_account',
+  },
+  {
+    id: 'sa-002',
+    clientId: 'client-def-456',
+    createdAt: 1706745600,
+    createdBy: 'jane.smith',
+    name: 'data-pipeline',
+    description: 'ETL pipeline service account',
+    saType: 'service_account',
+  },
+  {
+    id: 'sat-001',
+    clientId: 'token-user-001',
+    createdAt: 1709251200,
+    createdBy: 'bob.wilson',
+    name: 'deploy-token',
+    description: 'CI/CD deployment token',
+    saType: 'service_access_token',
+  },
+  {
+    id: 'sat-002',
+    clientId: 'token-user-002',
+    createdAt: 1711929600,
+    createdBy: 'alice.johnson',
+    name: 'monitoring-token',
+    description: 'Observability access token',
+    saType: 'service_access_token',
+  },
+  {
+    id: 'sa-003',
+    clientId: 'client-ghi-789',
+    createdAt: 1714521600,
+    createdBy: 'john.doe',
+    name: 'backup-service',
+    description: 'Automated backup service account',
+    saType: 'service_account',
+  },
+];
+
+/**
+ * Filter by "Service account" type — only service accounts are shown.
+ */
+export const FilterByServiceAccountType: Story = {
+  globals: { satFlag: 'enabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_account',
+  },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mixedTypeMockAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(
+      () => expect(canvas.getByText('my-api-service')).toBeInTheDocument(),
+      { timeout: 30000, interval: 1000 }
+    );
+
+    // Service accounts visible
+    expect(canvas.getByText('my-api-service')).toBeInTheDocument();
+    expect(canvas.getByText('data-pipeline')).toBeInTheDocument();
+    expect(canvas.getByText('backup-service')).toBeInTheDocument();
+
+    // Service access tokens NOT visible
+    expect(canvas.queryByText('deploy-token')).not.toBeInTheDocument();
+    expect(canvas.queryByText('monitoring-token')).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * Filter by "Service Access Token" type — only tokens are shown.
+ */
+export const FilterByServiceAccessTokenType: Story = {
+  globals: { satFlag: 'enabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_access_token',
+  },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mixedTypeMockAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(
+      () => expect(canvas.getByText('deploy-token')).toBeInTheDocument(),
+      { timeout: 30000, interval: 1000 }
+    );
+
+    // Service access tokens visible
+    expect(canvas.getByText('deploy-token')).toBeInTheDocument();
+    expect(canvas.getByText('monitoring-token')).toBeInTheDocument();
+
+    // Service accounts NOT visible
+    expect(canvas.queryByText('my-api-service')).not.toBeInTheDocument();
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * Clear all filters — type filter chip removed, all results shown.
+ */
+export const TypeFilterClearAll: Story = {
+  globals: { satFlag: 'enabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_account',
+  },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mixedTypeMockAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(
+      () => expect(canvas.getByText('my-api-service')).toBeInTheDocument(),
+      { timeout: 30000, interval: 1000 }
+    );
+
+    // Only service accounts visible initially
+    expect(canvas.queryByText('deploy-token')).not.toBeInTheDocument();
+
+    // Click "Clear filters" (toolbar button rendered by DataViewToolbar)
+    await userEvent.click(
+      canvas.getAllByRole('button', { name: 'Clear filters' })[0]
+    );
+
+    // All accounts now visible
+    await waitFor(() =>
+      expect(canvas.getByText('deploy-token')).toBeInTheDocument()
+    );
+    expect(canvas.getByText('my-api-service')).toBeInTheDocument();
+  },
+};
+
+/**
+ * Combined filters — type + name filters applied together.
+ */
+export const TypeFilterCombinedWithName: Story = {
+  globals: { satFlag: 'enabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_account&name=backup',
+  },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mixedTypeMockAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(
+      () => expect(canvas.getByText('backup-service')).toBeInTheDocument(),
+      { timeout: 30000, interval: 1000 }
+    );
+
+    // Only backup-service matches type=service_account AND name=backup
+    expect(canvas.queryByText('my-api-service')).not.toBeInTheDocument();
+    expect(canvas.queryByText('deploy-token')).not.toBeInTheDocument();
+  },
+};
+
+/**
+ * Empty results — type filter returns no matches.
+ */
+export const TypeFilterEmptyResults: Story = {
+  globals: { satFlag: 'enabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_access_token',
+  },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers(
+        // Only service accounts, no tokens
+        mixedTypeMockAccounts.filter((sa) => sa.saType === 'service_account')
+      ),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await waitFor(() =>
+      expect(canvas.getByText('No results found')).toBeInTheDocument()
+    );
+    expect(
+      canvas.getByText(/No results match the filter criteria/)
+    ).toBeInTheDocument();
+  },
+};
+
+/**
+ * Type filter flag off — type URL param is ignored, all results shown.
+ */
+export const TypeFilterFlagOff: Story = {
+  globals: { satFlag: 'disabled' },
+  args: {
+    initialRoute: '/iam/service-accounts?type=service_account',
+  },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mixedTypeMockAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // With the flag off, the type param is ignored — all results shown
+    await waitFor(
+      () => expect(canvas.getByText('my-api-service')).toBeInTheDocument(),
+      { timeout: 30000, interval: 1000 }
+    );
+
+    // Both types visible since flag is off (no type param sent to API)
+    expect(canvas.getByText('deploy-token')).toBeInTheDocument();
+    expect(canvas.getByText('monitoring-token')).toBeInTheDocument();
   },
 };

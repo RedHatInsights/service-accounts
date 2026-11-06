@@ -45,6 +45,24 @@ describe('buildQueryParams', () => {
     expect(result).toBe('first=0&max=10&name=test');
   });
 
+  it('should include type filter when provided', () => {
+    const result = buildQueryParams({
+      first: 0,
+      max: 10,
+      filters: { type: 'service_account' },
+    });
+    expect(result).toBe('first=0&max=10&type=service_account');
+  });
+
+  it('should include type alongside other filters', () => {
+    const result = buildQueryParams({
+      first: 0,
+      max: 10,
+      filters: { name: 'test', type: 'service_access_token' },
+    });
+    expect(result).toBe('first=0&max=10&name=test&type=service_access_token');
+  });
+
   it('should build complete query with all parameters', () => {
     const result = buildQueryParams({
       first: 20,

@@ -11,11 +11,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useMemo } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { Outlet, useSearchParams } from 'react-router-dom';
+import { useFlag } from '@unleash/proxy-client-react';
 import {
   SortByField,
   SortOrder,
   fetchServiceAccounts,
 } from '../../shared/fetchServiceAccounts';
+import { isValidServiceAccountType } from '../../shared/serviceAccountTypes';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 
@@ -55,17 +57,32 @@ const ListServiceAccountsPage = () => {
   const filterName = searchParams.get('name') || '';
   const filterClientId = searchParams.get('clientId') || '';
   const filterCreator = searchParams.get('creator') || '';
+  const filterTypeRaw = searchParams.get('type') || '';
+
+  const isTypeFilteringEnabled = useFlag('platform.service-accounts.sat');
+
+  // Only include the type param when the flag is on AND the value is valid.
+  const filterType =
+    isTypeFilteringEnabled && isValidServiceAccountType(filterTypeRaw)
+      ? filterTypeRaw
+      : '';
 
   const filters = useMemo(
     () => ({
       ...(filterName && { name: filterName }),
       ...(filterClientId && { clientId: filterClientId }),
       ...(filterCreator && { creator: filterCreator }),
+      ...(filterType && { type: filterType }),
     }),
-    [filterName, filterClientId, filterCreator]
+    [filterName, filterClientId, filterCreator, filterType]
   );
 
-  const hasActiveFilters = !!(filterName || filterClientId || filterCreator);
+  const hasActiveFilters = !!(
+    filterName ||
+    filterClientId ||
+    filterCreator ||
+    filterType
+  );
 
   const queryClient = useQueryClient();
   const results = useQuery({
