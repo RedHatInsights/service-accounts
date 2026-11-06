@@ -823,7 +823,7 @@ const mixedTypeMockAccounts: MockServiceAccount[] = [
  * Filter by "Service account" type — only service accounts are shown.
  */
 export const FilterByServiceAccountType: Story = {
-  globals: { typeFilteringFlag: 'enabled' },
+  globals: { satFlag: 'enabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_account',
   },
@@ -853,7 +853,7 @@ export const FilterByServiceAccountType: Story = {
  * Filter by "Service Access Token" type — only tokens are shown.
  */
 export const FilterByServiceAccessTokenType: Story = {
-  globals: { typeFilteringFlag: 'enabled' },
+  globals: { satFlag: 'enabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_access_token',
   },
@@ -882,7 +882,7 @@ export const FilterByServiceAccessTokenType: Story = {
  * Clear all filters — type filter chip removed, all results shown.
  */
 export const TypeFilterClearAll: Story = {
-  globals: { typeFilteringFlag: 'enabled' },
+  globals: { satFlag: 'enabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_account',
   },
@@ -917,7 +917,7 @@ export const TypeFilterClearAll: Story = {
  * Combined filters — type + name filters applied together.
  */
 export const TypeFilterCombinedWithName: Story = {
-  globals: { typeFilteringFlag: 'enabled' },
+  globals: { satFlag: 'enabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_account&name=backup',
   },
@@ -942,7 +942,7 @@ export const TypeFilterCombinedWithName: Story = {
  * Empty results — type filter returns no matches.
  */
 export const TypeFilterEmptyResults: Story = {
-  globals: { typeFilteringFlag: 'enabled' },
+  globals: { satFlag: 'enabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_access_token',
   },
@@ -970,7 +970,7 @@ export const TypeFilterEmptyResults: Story = {
  * Type filter flag off — type URL param is ignored, all results shown.
  */
 export const TypeFilterFlagOff: Story = {
-  globals: { typeFilteringFlag: 'disabled' },
+  globals: { satFlag: 'disabled' },
   args: {
     initialRoute: '/iam/service-accounts?type=service_account',
   },

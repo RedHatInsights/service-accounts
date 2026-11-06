@@ -63,9 +63,7 @@ const ListServiceAccountsPage = () => {
   const filterCreator = searchParams.get('creator') || '';
   const filterTypeRaw = searchParams.get('type') || '';
 
-  const isTypeFilteringEnabled = useFlag(
-    'platform.service-accounts.type-filtering'
-  );
+  const isTypeFilteringEnabled = useFlag('platform.service-accounts.sat');
 
   // Only include the type param when the flag is on AND the value is valid.
   const filterType =

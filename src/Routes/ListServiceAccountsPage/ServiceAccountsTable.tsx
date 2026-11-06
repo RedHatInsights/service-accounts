@@ -184,9 +184,6 @@ export const ServiceAccountsTable: FunctionComponent<
   const isSortingEnabled = useFlag('platform.service-accounts.sorting');
   const isFilteringEnabled = useFlag('platform.service-accounts.filtering');
   const isSatEnabled = useFlag('platform.service-accounts.sat');
-  const isTypeFilteringEnabled = useFlag(
-    'platform.service-accounts.type-filtering'
-  );
 
   const [isOrgAdmin, setIsOrgAdmin] = useState<boolean | undefined>();
   const [isRbacAdmin, setIsRbacAdmin] = useState<boolean | undefined>();
@@ -256,10 +253,10 @@ export const ServiceAccountsTable: FunctionComponent<
 
   /** Type filter value read from URL (not debounced). */
   const typeFilterValue = useMemo(() => {
-    if (!isTypeFilteringEnabled) return '';
+    if (!isSatEnabled) return '';
     const raw = searchParams.get('type') || '';
     return isValidServiceAccountType(raw) ? raw : '';
-  }, [searchParams, isTypeFilteringEnabled]);
+  }, [searchParams, isSatEnabled]);
 
   const [filterInputs, setFilterInputs] =
     useState<Record<TextFilterKey, string>>(urlTextFilters);
@@ -337,8 +334,8 @@ export const ServiceAccountsTable: FunctionComponent<
     () =>
       isFilteringEnabled &&
       (TEXT_FILTER_KEYS.some((key) => filterInputs[key]) ||
-        (isTypeFilteringEnabled && !!typeFilterValue)),
-    [isFilteringEnabled, isTypeFilteringEnabled, filterInputs, typeFilterValue]
+        (isSatEnabled && !!typeFilterValue)),
+    [isFilteringEnabled, isSatEnabled, filterInputs, typeFilterValue]
   );
 
   const canChange = useCallback(
@@ -514,7 +511,7 @@ export const ServiceAccountsTable: FunctionComponent<
               }}
               values={{
                 ...filterInputs,
-                ...(isTypeFilteringEnabled && {
+                ...(isSatEnabled && {
                   type: typeFilterValue ? [typeFilterValue] : [],
                 }),
               }}
@@ -541,7 +538,7 @@ export const ServiceAccountsTable: FunctionComponent<
                 )}
                 ouiaId={`${OUIA_ID}-filter-creator`}
               />
-              {isTypeFilteringEnabled && (
+              {isSatEnabled && (
                 <DataViewCheckboxFilter
                   filterId="type"
                   title={intl.formatMessage(messages.filterTypeTitle)}
