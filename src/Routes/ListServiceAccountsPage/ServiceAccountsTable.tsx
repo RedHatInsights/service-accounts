@@ -99,10 +99,6 @@ const messages = defineMessages({
     id: 'serviceAccounts.table.filter.clientIdPlaceholder',
     defaultMessage: 'Filter by client ID',
   },
-  filterClientIdOrUsernamePlaceholder: {
-    id: 'serviceAccounts.table.filter.clientIdOrUsernamePlaceholder',
-    defaultMessage: 'Filter by client ID or username',
-  },
   filterOwnerPlaceholder: {
     id: 'serviceAccounts.table.filter.ownerPlaceholder',
     defaultMessage: 'Filter by owner',
@@ -355,11 +351,14 @@ export const ServiceAccountsTable: FunctionComponent<
         row: [
           sa.name,
           sa.description,
-          sa.clientId,
+          sa.serviceAccessTokenId ?? sa.clientId,
           sa.createdBy,
           <DateFormat key={`date-${sa.id}`} date={sa.createdAt * 1000} />,
           {
-            cell: <ActionsColumn items={getRowActions(sa)} />,
+            cell:
+              sa.type === 'service_access_token' ? null : (
+                <ActionsColumn items={getRowActions(sa)} />
+              ),
             props: { isActionCell: true },
           },
         ],
@@ -466,15 +465,9 @@ export const ServiceAccountsTable: FunctionComponent<
               />
               <DataViewTextFilter
                 filterId="clientId"
-                title={intl.formatMessage(
-                  isSatEnabled
-                    ? messages.columnClientIdOrUsername
-                    : messages.columnClientId
-                )}
+                title={intl.formatMessage(messages.columnClientId)}
                 placeholder={intl.formatMessage(
-                  isSatEnabled
-                    ? messages.filterClientIdOrUsernamePlaceholder
-                    : messages.filterClientIdPlaceholder
+                  messages.filterClientIdPlaceholder
                 )}
                 ouiaId={`${OUIA_ID}-filter-clientId`}
               />

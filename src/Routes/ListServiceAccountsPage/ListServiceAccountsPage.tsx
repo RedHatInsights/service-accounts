@@ -8,7 +8,8 @@ import ErrorState from '@patternfly/react-component-groups/dist/dynamic/ErrorSta
 import ExternalLinkAltIcon from '@patternfly/react-icons/dist/dynamic/icons/external-link-alt-icon';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useEffect, useMemo } from 'react';
+import { useFlag } from '@unleash/proxy-client-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { Outlet, useSearchParams } from 'react-router-dom';
 import {
@@ -16,6 +17,8 @@ import {
   SortOrder,
   fetchServiceAccounts,
 } from '../../shared/fetchServiceAccounts';
+import { createServiceAccessToken } from '../../shared/createServiceAccessToken';
+import { CreateServiceAccessTokenFlow } from '../CreateServiceAccessTokenPage/CreateServiceAccessTokenFlow';
 import { EmptyStateNoServiceAccounts } from './EmptyStateNoServiceAccounts';
 import { ServiceAccountsTable } from './ServiceAccountsTable';
 
@@ -38,6 +41,8 @@ const messages = defineMessages({
 const ListServiceAccountsPage = () => {
   const { appAction } = useChrome();
   const intl = useIntl();
+  const isSatEnabled = useFlag('platform.service-accounts.sat');
+  const [isCreateTokenOpen, setIsCreateTokenOpen] = useState(false);
 
   useEffect(() => {
     appAction('service-accounts-list');
@@ -68,6 +73,17 @@ const ListServiceAccountsPage = () => {
   const hasActiveFilters = !!(filterName || filterClientId || filterCreator);
 
   const queryClient = useQueryClient();
+  const createToken = async (name: string, description: string) => {
+    const token = await auth.getToken();
+    return createServiceAccessToken({
+      name,
+      description,
+      token: token as string,
+      sso: getEnvironmentDetails()?.sso as string,
+    });
+  };
+  const refreshServiceAccounts = () =>
+    queryClient.invalidateQueries({ queryKey: ['service-accounts'] });
   const results = useQuery({
     queryKey: ['service-accounts', page, perPage, orderBy, sortOrder, filters],
     queryFn: async () => {
@@ -124,12 +140,26 @@ const ListServiceAccountsPage = () => {
               serviceAccounts={results.data?.serviceAccounts || []}
               hasMore={results.data?.hasMore ?? false}
               isLoading={results.isLoading}
+              onCreateToken={
+                isSatEnabled ? () => setIsCreateTokenOpen(true) : undefined
+              }
             />
           ) : (
-            <EmptyStateNoServiceAccounts />
+            <EmptyStateNoServiceAccounts
+              onCreateToken={
+                isSatEnabled ? () => setIsCreateTokenOpen(true) : undefined
+              }
+            />
           )}
         </>
         <Outlet />
+        {isSatEnabled && isCreateTokenOpen && (
+          <CreateServiceAccessTokenFlow
+            createToken={createToken}
+            onClose={() => setIsCreateTokenOpen(false)}
+            onCreated={refreshServiceAccounts}
+          />
+        )}
       </Main>
     </>
   );

@@ -141,20 +141,26 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
       const body = (await request.json()) as {
         name: string;
         description: string;
+        type?: string;
       };
+      const clientId = `client-${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}`;
 
       const newServiceAccount: NewServiceAccount = {
         id: `sa-${Date.now()}`,
-        clientId: `client-${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(7)}`,
+        clientId,
         secret: `secret-${Math.random()
           .toString(36)
           .substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}`,
-        createdAt: Date.now(),
+        createdAt: Math.floor(Date.now() / 1000),
         createdBy: 'john.doe',
         name: body.name,
         description: body.description,
+        ...(body.type === 'service_access_token' && {
+          type: 'service_access_token' as const,
+          serviceAccessTokenId: `|service-account-${clientId}`,
+        }),
       };
 
       serviceAccounts = [newServiceAccount, ...serviceAccounts];
@@ -265,6 +271,7 @@ const meta: Meta<typeof PageWithRoutes> = {
   title: 'User Journeys/Service Accounts',
   component: PageWithRoutes,
   tags: ['autodocs'],
+  globals: { satFlag: 'disabled' },
   parameters: {
     layout: 'fullscreen',
     skipGlobalDecorators: true,
@@ -279,6 +286,7 @@ Complete end-to-end user flows for the Service Accounts application.
 
 - **Default**: Basic page view with data loaded
 - **Create Service Account Journey**: Full create flow with validation
+- **Create Service Access Token Journey**: SAT create request and one-time credential reveal
 - **Delete Service Account Journey**: Full delete flow with confirmation
 - **Reset Service Account Journey**: Full reset credentials flow
         `,
@@ -319,6 +327,82 @@ export const InitialEmptyState: Story = {
       expect(canvas.getByText('No service accounts yet')).toBeInTheDocument()
     );
     expect(canvas.getByText('Create service account')).toBeInTheDocument();
+  },
+};
+
+export const CreateServiceAccessTokenJourney: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers(mockServiceAccounts),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+
+    await waitFor(() =>
+      expect(canvas.getByText('my-api-service')).toBeInTheDocument()
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Create new' }));
+    await userEvent.click(page.getByText('Service access token'));
+
+    const modal = within(
+      await page.findByRole('dialog', {
+        name: 'Create a service access token',
+      })
+    );
+    const create = modal.getByRole('button', { name: 'Create' });
+    expect(create).toBeDisabled();
+    await userEvent.type(modal.getByLabelText(/^Name/), 'build-token');
+    await userEvent.type(
+      modal.getByLabelText(/^Short description/),
+      'Build access'
+    );
+    await userEvent.click(create);
+
+    await waitFor(() =>
+      expect(page.getByText('Service access token created')).toBeInTheDocument()
+    );
+    const username = page.getByDisplayValue(/^\|service-account-client-/);
+    const usernameValue = (username as HTMLInputElement).value;
+    expect(username).toBeInTheDocument();
+    expect(page.getByDisplayValue(/^secret-/)).toBeInTheDocument();
+
+    await userEvent.click(
+      page.getByLabelText('I have copied the username and token')
+    );
+    await userEvent.click(page.getByRole('button', { name: 'Close' }));
+
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    expect(page.queryByDisplayValue(/^secret-/)).not.toBeInTheDocument();
+    expect(canvas.getByText(usernameValue)).toBeInTheDocument();
+  },
+};
+
+export const CreateTokenFromEmptyState: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+
+    await waitFor(() =>
+      expect(
+        canvas.getByText('No service accounts or service access tokens yet')
+      ).toBeInTheDocument()
+    );
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Create service access token' })
+    );
+    expect(page.getByText('Create a service access token')).toBeInTheDocument();
+    await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
   },
 };
 
