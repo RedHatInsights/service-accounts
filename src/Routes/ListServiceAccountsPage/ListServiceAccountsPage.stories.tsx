@@ -163,7 +163,9 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
         }),
       };
 
-      serviceAccounts = [newServiceAccount, ...serviceAccounts];
+      const savedServiceAccount = { ...newServiceAccount };
+      Reflect.deleteProperty(savedServiceAccount, 'secret');
+      serviceAccounts = [savedServiceAccount, ...serviceAccounts];
 
       return HttpResponse.json(newServiceAccount, { status: 201 });
     }),
@@ -187,7 +189,16 @@ const createStatefulHandlers = (initialServiceAccounts: ServiceAccount[]) => {
       const resetResponse: NewServiceAccount = {
         ...sa,
         secret: `new-secret-${Math.random().toString(36).substring(2, 15)}`,
+        ...(sa.type === 'service_access_token' && {
+          expiresAt: Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60,
+        }),
       };
+
+      const savedServiceAccount = { ...resetResponse };
+      Reflect.deleteProperty(savedServiceAccount, 'secret');
+      serviceAccounts = serviceAccounts.map((account) =>
+        account.id === sa.id ? savedServiceAccount : account
+      );
 
       return HttpResponse.json(resetResponse);
     }),
@@ -220,6 +231,18 @@ const mockServiceAccounts: ServiceAccount[] = [
     description: 'System monitoring service',
   },
 ];
+
+const mockServiceAccessToken: ServiceAccount = {
+  id: 'sat-001',
+  clientId: 'client-sat-123',
+  type: 'service_access_token',
+  serviceAccessTokenId: '|service-account-client-sat-123',
+  expiresAt: 1704067200,
+  createdAt: 1704067200,
+  createdBy: 'john.doe',
+  name: 'build-token',
+  description: 'Build access',
+};
 
 const createQueryClient = () =>
   new QueryClient({
@@ -289,6 +312,7 @@ Complete end-to-end user flows for the Service Accounts application.
 - **Create Service Access Token Journey**: SAT create request and one-time credential reveal
 - **Delete Service Account Journey**: Full delete flow with confirmation
 - **Reset Service Account Journey**: Full reset credentials flow
+- **Reset Service Access Token Journey**: SAT warning and one-time token reveal
         `,
       },
     },
@@ -362,7 +386,9 @@ export const CreateServiceAccessTokenJourney: Story = {
     await userEvent.click(create);
 
     await waitFor(() =>
-      expect(page.getByText('Service access token created')).toBeInTheDocument()
+      expect(
+        page.getByText('Credentials successfully generated')
+      ).toBeInTheDocument()
     );
     const username = page.getByDisplayValue(/^\|service-account-client-/);
     const usernameValue = (username as HTMLInputElement).value;
@@ -378,7 +404,10 @@ export const CreateServiceAccessTokenJourney: Story = {
       expect(canvas.getByText('build-token')).toBeInTheDocument()
     );
     expect(page.queryByDisplayValue(/^secret-/)).not.toBeInTheDocument();
-    expect(canvas.getByText(usernameValue)).toBeInTheDocument();
+    expect(
+      canvas.getByText(usernameValue.replace(/^\|service-account-/, ''))
+    ).toBeInTheDocument();
+    expect(canvas.queryByText(usernameValue)).not.toBeInTheDocument();
   },
 };
 
@@ -732,5 +761,168 @@ export const ResetServiceAccountJourney: Story = {
       },
       { timeout: 15000 }
     );
+  },
+};
+
+async function openSatReset(canvas: ReturnType<typeof within>) {
+  const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+  const buttons = row.querySelectorAll('button');
+  await userEvent.click(buttons[buttons.length - 1]);
+  await userEvent.click(
+    await within(document.body).findByText('Reset credentials')
+  );
+  return within(
+    await within(document.body).findByRole('dialog', {
+      name: 'Reset service access token credentials?',
+    })
+  );
+}
+
+export const ResetServiceAccessTokenJourney: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([mockServiceAccessToken]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    expect(canvas.getByText('Token').closest('.pf-v6-c-label')).toHaveClass(
+      'pf-m-blue'
+    );
+
+    const confirmation = await openSatReset(canvas);
+    expect(
+      confirmation.getByText(/current token stop working/)
+    ).toBeInTheDocument();
+    expect(
+      confirmation.getByText(/username will stay the same/)
+    ).toBeInTheDocument();
+    await userEvent.click(confirmation.getByRole('button', { name: 'Reset' }));
+
+    const credentials = within(
+      await page.findByRole('dialog', {
+        name: 'Service access token credentials',
+      })
+    );
+    expect(
+      credentials.getByDisplayValue('|service-account-client-sat-123')
+    ).toBeInTheDocument();
+    expect(
+      credentials.getByText('Credentials successfully generated')
+    ).toBeInTheDocument();
+    expect(credentials.getByText('Username')).toBeInTheDocument();
+    expect(credentials.getByText('Token')).toBeInTheDocument();
+    expect(credentials.getByDisplayValue(/^new-secret-/)).toBeInTheDocument();
+    const close = credentials.getByRole('button', { name: 'Close' });
+    expect(close).toBeDisabled();
+    await userEvent.click(
+      credentials.getByLabelText('I have copied the username and token')
+    );
+    await userEvent.click(close);
+
+    await waitFor(() =>
+      expect(page.queryByDisplayValue(/^new-secret-/)).not.toBeInTheDocument()
+    );
+    const secondConfirmation = await openSatReset(canvas);
+    expect(
+      secondConfirmation.queryByDisplayValue(/^new-secret-/)
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      secondConfirmation.getByRole('link', { name: 'Cancel' })
+    );
+  },
+};
+
+export const FailedServiceAccessTokenReset: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: [
+        http.post(
+          '*/apis/service_accounts/v1/:id/resetSecret',
+          () => new HttpResponse(null, { status: 403 })
+        ),
+        ...createStatefulHandlers([mockServiceAccessToken]),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const confirmation = await openSatReset(canvas);
+    await userEvent.click(confirmation.getByRole('button', { name: 'Reset' }));
+    await waitFor(() =>
+      expect(
+        confirmation.getByText(
+          'The service access token could not be reset. Try again.'
+        )
+      ).toBeInTheDocument()
+    );
+    expect(
+      within(document.body).queryByText('Credentials successfully generated')
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const UnconfirmedServiceAccessTokenReset: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: [
+        http.post('*/apis/service_accounts/v1/:id/resetSecret', () =>
+          HttpResponse.json({
+            type: 'service_access_token',
+            serviceAccessTokenId: '|service-account-client-sat-123',
+          })
+        ),
+        ...createStatefulHandlers([mockServiceAccessToken]),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const confirmation = await openSatReset(canvas);
+    await userEvent.click(confirmation.getByRole('button', { name: 'Reset' }));
+    await waitFor(() =>
+      expect(
+        confirmation.getByText(/The old token may no longer work/)
+      ).toBeInTheDocument()
+    );
+    expect(
+      within(document.body).queryByText('Credentials successfully generated')
+    ).not.toBeInTheDocument();
+  },
+};
+
+export const ServiceAccessTokenResetFlagDisabled: Story = {
+  globals: { satFlag: 'disabled' },
+  args: { initialRoute: '/iam/service-accounts/reset/sat-001' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([mockServiceAccessToken]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole('dialog')
+      ).not.toBeInTheDocument()
+    );
+    const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+    expect(row.querySelector('button')).toBeNull();
   },
 };

@@ -28,6 +28,10 @@ const messages = defineMessages({
     id: 'serviceAccounts.credentials.ariaLabel',
     defaultMessage: 'Service account credentials',
   },
+  satModalAriaLabel: {
+    id: 'serviceAccounts.token.credentials.ariaLabel',
+    defaultMessage: 'Service access token credentials',
+  },
   errorTitle: {
     id: 'serviceAccounts.credentials.errorTitle',
     defaultMessage: 'Credentials were not generated successfully',
@@ -45,6 +49,11 @@ const messages = defineMessages({
     defaultMessage:
       'Connect to Red Hat cloud services or APIs using this client ID and secret',
   },
+  satConnectBody: {
+    id: 'serviceAccounts.token.credentials.connectBody',
+    defaultMessage:
+      'Connect to Red Hat cloud services or APIs using this username and token',
+  },
   clientId: {
     id: 'serviceAccounts.credentials.clientId',
     defaultMessage: 'Client ID',
@@ -53,33 +62,79 @@ const messages = defineMessages({
     id: 'serviceAccounts.credentials.clientSecret',
     defaultMessage: 'Client secret',
   },
+  username: {
+    id: 'serviceAccounts.token.credentials.username',
+    defaultMessage: 'Username',
+  },
+  token: {
+    id: 'serviceAccounts.token.credentials.token',
+    defaultMessage: 'Token',
+  },
   safeCopyBody: {
     id: 'serviceAccounts.credentials.safeCopyBody',
     defaultMessage:
       'Make a copy of the client ID and secret to store in a safe place. The client secret won’t appear again after closing this screen.',
   },
+  satSafeCopyBody: {
+    id: 'serviceAccounts.token.credentials.oneTime',
+    defaultMessage:
+      'Copy the username and token now. The token will not be shown again after you close this window.',
+  },
   confirmCheckbox: {
     id: 'serviceAccounts.credentials.confirmCheckbox',
     defaultMessage: 'I have copied the client ID and secret',
   },
+  satConfirmCheckbox: {
+    id: 'serviceAccounts.token.credentials.acknowledge',
+    defaultMessage: 'I have copied the username and token',
+  },
 });
 
-export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
-  serviceAccount: NewServiceAccount;
-}> = ({ serviceAccount }) => {
+type Props =
+  | {
+      serviceAccount: NewServiceAccount;
+      serviceAccessToken?: never;
+      onClose?: never;
+    }
+  | {
+      serviceAccount?: never;
+      serviceAccessToken: { username: string; token: string };
+      onClose: () => void;
+    };
+
+export const ServiceAccountNameSecretModal: VoidFunctionComponent<Props> = ({
+  serviceAccount,
+  serviceAccessToken,
+  onClose,
+}) => {
   const [confirmationCheckbox, confirm] = useState(false);
   const intl = useIntl();
+  const isSat = !!serviceAccessToken;
+  const identifier = serviceAccessToken
+    ? serviceAccessToken.username
+    : serviceAccount!.clientId;
+  const secret = serviceAccessToken
+    ? serviceAccessToken.token
+    : serviceAccount!.secret;
+  const identifierLabel = intl.formatMessage(
+    isSat ? messages.username : messages.clientId
+  );
+  const secretLabel = intl.formatMessage(
+    isSat ? messages.token : messages.clientSecret
+  );
   return (
     <Modal
       id="modalCreateServiceAccountStep2"
       variant={ModalVariant.medium}
-      aria-label={intl.formatMessage(messages.modalAriaLabel)}
+      aria-label={intl.formatMessage(
+        isSat ? messages.satModalAriaLabel : messages.modalAriaLabel
+      )}
       isOpen
       appendTo={appendTo}
       ouiaId="modal-Credentials"
     >
       <ModalBody>
-        {serviceAccount.error ? (
+        {serviceAccount?.error ? (
           <ErrorState
             titleText={intl.formatMessage(messages.errorTitle)}
             bodyText={serviceAccount.error_description}
@@ -88,7 +143,10 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 variant={ButtonVariant.primary}
                 data-testid="modalCredentialsError-buttonClose"
                 ouiaId="button-close"
-                component={(props) => <AppLink {...props} to="" />}
+                component={
+                  onClose ? undefined : (props) => <AppLink {...props} to="" />
+                }
+                onClick={onClose}
               >
                 {intl.formatMessage(messages.close)}
               </Button>
@@ -106,7 +164,11 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   component={ContentVariants.small}
                   className="pf-u-mt-lg"
                 >
-                  <FormattedMessage {...messages.connectBody} />
+                  <FormattedMessage
+                    {...(isSat
+                      ? messages.satConnectBody
+                      : messages.connectBody)}
+                  />
                 </Content>
               </Content>
               <InputGroup className="pf-u-mt-lg">
@@ -114,7 +176,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   className="pf-u-text-nowrap pf-u-flex-shrink-0"
                   style={{ minWidth: '120px', textAlign: 'left' }}
                 >
-                  {intl.formatMessage(messages.clientId)}
+                  {identifierLabel}
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
@@ -122,9 +184,9 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     isReadOnly
                     data-testid="modalCredentials-copyClientID"
                     ouiaId="button-copy-clientID"
-                    textAriaLabel={intl.formatMessage(messages.clientId)}
+                    textAriaLabel={identifierLabel}
                   >
-                    {serviceAccount.clientId}
+                    {identifier}
                   </ClipboardCopy>
                 </InputGroupItem>
               </InputGroup>
@@ -133,7 +195,7 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   className="pf-u-text-nowrap pf-u-flex-shrink-0"
                   style={{ minWidth: '120px', textAlign: 'left' }}
                 >
-                  {intl.formatMessage(messages.clientSecret)}
+                  {secretLabel}
                 </InputGroupText>
                 <InputGroupItem className="pf-v6-u-w-100">
                   <ClipboardCopy
@@ -141,9 +203,9 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                     className="pf-v6-u-w-100"
                     data-testid="modalCredentials-copyClientSecret"
                     ouiaId="button-copy-clientSecret"
-                    textAriaLabel={intl.formatMessage(messages.clientSecret)}
+                    textAriaLabel={secretLabel}
                   >
-                    {serviceAccount.secret}
+                    {secret}
                   </ClipboardCopy>
                 </InputGroupItem>
               </InputGroup>
@@ -152,12 +214,20 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                   component={ContentVariants.small}
                   className="pf-u-mt-lg"
                 >
-                  <FormattedMessage {...messages.safeCopyBody} />
+                  <FormattedMessage
+                    {...(isSat
+                      ? messages.satSafeCopyBody
+                      : messages.safeCopyBody)}
+                  />
                 </Content>
               </Content>
               <Bullseye className="pf-u-mt-lg">
                 <Checkbox
-                  label={intl.formatMessage(messages.confirmCheckbox)}
+                  label={intl.formatMessage(
+                    isSat
+                      ? messages.satConfirmCheckbox
+                      : messages.confirmCheckbox
+                  )}
                   isChecked={confirmationCheckbox}
                   onChange={(_event, val) => confirm(val)}
                   id="check-1"
@@ -170,7 +240,10 @@ export const ServiceAccountNameSecretModal: VoidFunctionComponent<{
                 isDisabled={!confirmationCheckbox}
                 data-testid="modalCredentials-buttonClose"
                 ouiaId="button-close"
-                component={(props) => <AppLink {...props} to="" />}
+                component={
+                  onClose ? undefined : (props) => <AppLink {...props} to="" />
+                }
+                onClick={onClose}
               >
                 {intl.formatMessage(messages.close)}
               </Button>

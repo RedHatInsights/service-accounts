@@ -1,8 +1,6 @@
 import {
   Alert,
   Button,
-  Checkbox,
-  ClipboardCopy,
   Form,
   FormGroup,
   Modal,
@@ -14,6 +12,7 @@ import {
 import React, { FunctionComponent, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { ServiceAccessTokenUnavailableError } from '../../shared/createServiceAccessToken';
+import { ServiceAccountNameSecretModal } from '../../shared/ServiceAccountNameSecretModal';
 import { appendTo } from '../../shared/utils';
 
 const messages = defineMessages({
@@ -51,31 +50,6 @@ const messages = defineMessages({
     defaultMessage:
       'The server did not confirm a service access token. Check the service account list before trying again.',
   },
-  success: {
-    id: 'serviceAccounts.token.credentials.success',
-    defaultMessage: 'Service access token created',
-  },
-  oneTime: {
-    id: 'serviceAccounts.token.credentials.oneTime',
-    defaultMessage:
-      'Copy the username and token now. The token will not be shown again after you close this window.',
-  },
-  username: {
-    id: 'serviceAccounts.token.credentials.username',
-    defaultMessage: 'Username',
-  },
-  token: {
-    id: 'serviceAccounts.token.credentials.token',
-    defaultMessage: 'Token',
-  },
-  acknowledge: {
-    id: 'serviceAccounts.token.credentials.acknowledge',
-    defaultMessage: 'I have copied the username and token',
-  },
-  close: {
-    id: 'serviceAccounts.token.credentials.close',
-    defaultMessage: 'Close',
-  },
 });
 
 export type CreatedServiceAccessToken = {
@@ -104,7 +78,6 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
   >(null);
   const [credentials, setCredentials] =
     useState<CreatedServiceAccessToken | null>(null);
-  const [acknowledged, setAcknowledged] = useState(false);
 
   const close = () => {
     setCredentials(null);
@@ -137,122 +110,81 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
     }
   };
 
+  if (credentials) {
+    return (
+      <ServiceAccountNameSecretModal
+        serviceAccessToken={credentials}
+        onClose={close}
+      />
+    );
+  }
+
   return (
     <Modal
       isOpen
       variant="medium"
-      aria-label={intl.formatMessage(
-        credentials ? messages.success : messages.title
-      )}
+      aria-label={intl.formatMessage(messages.title)}
       appendTo={appendTo}
-      onClose={credentials || isCreating ? undefined : close}
+      onClose={isCreating ? undefined : close}
       ouiaId="modal-create-service-access-token"
     >
-      {credentials ? (
-        <>
-          <ModalHeader title={intl.formatMessage(messages.success)} />
-          <ModalBody>
-            <p>{intl.formatMessage(messages.oneTime)}</p>
-            <FormGroup
-              label={intl.formatMessage(messages.username)}
-              fieldId="sat-username"
-            >
-              <ClipboardCopy
-                id="sat-username"
-                isReadOnly
-                textAriaLabel={intl.formatMessage(messages.username)}
-              >
-                {credentials.username}
-              </ClipboardCopy>
-            </FormGroup>
-            <FormGroup
-              label={intl.formatMessage(messages.token)}
-              fieldId="sat-token"
-            >
-              <ClipboardCopy
-                id="sat-token"
-                isReadOnly
-                textAriaLabel={intl.formatMessage(messages.token)}
-              >
-                {credentials.token}
-              </ClipboardCopy>
-            </FormGroup>
-            <Checkbox
-              id="sat-acknowledge"
-              label={intl.formatMessage(messages.acknowledge)}
-              isChecked={acknowledged}
-              onChange={(_event, checked) => setAcknowledged(checked)}
+      <Form onSubmit={submit}>
+        <ModalHeader title={intl.formatMessage(messages.title)} />
+        <ModalBody>
+          {error && (
+            <Alert
+              variant="danger"
+              title={intl.formatMessage(
+                error === 'unavailable'
+                  ? messages.unavailable
+                  : error === 'unexpected'
+                  ? messages.unexpectedResponse
+                  : messages.error
+              )}
             />
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="primary"
-              isDisabled={!acknowledged}
-              onClick={close}
-            >
-              {intl.formatMessage(messages.close)}
-            </Button>
-          </ModalFooter>
-        </>
-      ) : (
-        <Form onSubmit={submit}>
-          <ModalHeader title={intl.formatMessage(messages.title)} />
-          <ModalBody>
-            {error && (
-              <Alert
-                variant="danger"
-                title={intl.formatMessage(
-                  error === 'unavailable'
-                    ? messages.unavailable
-                    : error === 'unexpected'
-                    ? messages.unexpectedResponse
-                    : messages.error
-                )}
-              />
-            )}
-            <FormGroup
+          )}
+          <FormGroup
+            isRequired
+            label={intl.formatMessage(messages.name)}
+            fieldId="sat-name"
+          >
+            <TextInput
+              id="sat-name"
+              value={name}
+              onChange={(_event, value) => setName(value)}
               isRequired
-              label={intl.formatMessage(messages.name)}
-              fieldId="sat-name"
-            >
-              <TextInput
-                id="sat-name"
-                value={name}
-                onChange={(_event, value) => setName(value)}
-                isRequired
-                maxLength={50}
-                autoFocus
-              />
-            </FormGroup>
-            <FormGroup
+              maxLength={50}
+              autoFocus
+            />
+          </FormGroup>
+          <FormGroup
+            isRequired
+            label={intl.formatMessage(messages.description)}
+            fieldId="sat-description"
+          >
+            <TextInput
+              id="sat-description"
+              value={description}
+              onChange={(_event, value) => setDescription(value)}
               isRequired
-              label={intl.formatMessage(messages.description)}
-              fieldId="sat-description"
-            >
-              <TextInput
-                id="sat-description"
-                value={description}
-                onChange={(_event, value) => setDescription(value)}
-                isRequired
-                maxLength={255}
-              />
-            </FormGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="primary"
-              type="submit"
-              isLoading={isCreating}
-              isDisabled={!name.trim() || !description.trim() || isCreating}
-            >
-              {intl.formatMessage(messages.create)}
-            </Button>
-            <Button variant="link" onClick={close} isDisabled={isCreating}>
-              {intl.formatMessage(messages.cancel)}
-            </Button>
-          </ModalFooter>
-        </Form>
-      )}
+              maxLength={255}
+            />
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            variant="primary"
+            type="submit"
+            isLoading={isCreating}
+            isDisabled={!name.trim() || !description.trim() || isCreating}
+          >
+            {intl.formatMessage(messages.create)}
+          </Button>
+          <Button variant="link" onClick={close} isDisabled={isCreating}>
+            {intl.formatMessage(messages.cancel)}
+          </Button>
+        </ModalFooter>
+      </Form>
     </Modal>
   );
 };

@@ -12,6 +12,7 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
+  Label,
   Pagination,
   ToolbarGroup,
   ToolbarItem,
@@ -111,6 +112,10 @@ const messages = defineMessages({
     id: 'serviceAccounts.table.action.resetCredentials',
     defaultMessage: 'Reset credentials',
   },
+  tokenLabel: {
+    id: 'serviceAccounts.table.tokenLabel',
+    defaultMessage: 'Token',
+  },
   actionDelete: {
     id: 'serviceAccounts.table.action.delete',
     defaultMessage: 'Delete service account',
@@ -141,6 +146,8 @@ const messages = defineMessages({
     defaultMessage: 'Clear all filters',
   },
 });
+
+const TOKEN_LABEL_COLOR = 'blue';
 
 export interface ServiceAccountsTableProps {
   serviceAccounts: ServiceAccount[];
@@ -328,20 +335,28 @@ export const ServiceAccountsTable: FunctionComponent<
   );
 
   const getRowActions = useCallback(
-    (sa: ServiceAccount) => [
-      {
+    (sa: ServiceAccount) => {
+      const reset = {
         title: intl.formatMessage(messages.actionResetCredentials),
         isDisabled: !canChange(sa),
-        ouiaId: 'reset-credentials-service-account-button',
+        ouiaId:
+          sa.type === 'service_access_token'
+            ? 'reset-service-access-token-button'
+            : 'reset-credentials-service-account-button',
         onClick: () => navigate(mergeToBasename(`reset/${sa.id}`)),
-      },
-      {
-        title: intl.formatMessage(messages.actionDelete),
-        isDisabled: !canChange(sa),
-        ouiaId: 'delete-service-account-button',
-        onClick: () => navigate(mergeToBasename(`delete/${sa.id}`)),
-      },
-    ],
+      };
+      return sa.type === 'service_access_token'
+        ? [reset]
+        : [
+            reset,
+            {
+              title: intl.formatMessage(messages.actionDelete),
+              isDisabled: !canChange(sa),
+              ouiaId: 'delete-service-account-button',
+              onClick: () => navigate(mergeToBasename(`delete/${sa.id}`)),
+            },
+          ];
+    },
     [canChange, navigate, intl]
   );
 
@@ -349,14 +364,25 @@ export const ServiceAccountsTable: FunctionComponent<
     () =>
       serviceAccounts.map((sa) => ({
         row: [
-          sa.name,
+          sa.type === 'service_access_token' ? (
+            <div>
+              {sa.name}
+              <div className="pf-v6-u-mt-xs">
+                <Label color={TOKEN_LABEL_COLOR}>
+                  {intl.formatMessage(messages.tokenLabel)}
+                </Label>
+              </div>
+            </div>
+          ) : (
+            sa.name
+          ),
           sa.description,
-          sa.serviceAccessTokenId ?? sa.clientId,
+          sa.clientId,
           sa.createdBy,
           <DateFormat key={`date-${sa.id}`} date={sa.createdAt * 1000} />,
           {
             cell:
-              sa.type === 'service_access_token' ? null : (
+              sa.type === 'service_access_token' && !isSatEnabled ? null : (
                 <ActionsColumn items={getRowActions(sa)} />
               ),
             props: { isActionCell: true },
@@ -364,7 +390,7 @@ export const ServiceAccountsTable: FunctionComponent<
         ],
         id: sa.id,
       })),
-    [serviceAccounts, getRowActions]
+    [serviceAccounts, getRowActions, intl, isSatEnabled]
   );
 
   const columns: DataViewTh[] = useMemo(
