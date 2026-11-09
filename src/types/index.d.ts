@@ -8,6 +8,8 @@ declare global {
 export type ServiceAccount = {
   id: string;
   clientId: string;
+  type?: 'service_access_token';
+  serviceAccessTokenId?: string;
   createdAt: number;
   createdBy: string;
   name: string;

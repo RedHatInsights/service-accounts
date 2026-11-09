@@ -13,6 +13,7 @@ import {
 } from '@patternfly/react-core';
 import React, { FunctionComponent, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
+import { ServiceAccessTokenUnavailableError } from '../../shared/createServiceAccessToken';
 import { appendTo } from '../../shared/utils';
 
 const messages = defineMessages({
@@ -39,6 +40,16 @@ const messages = defineMessages({
   error: {
     id: 'serviceAccounts.token.create.error',
     defaultMessage: 'The service access token could not be created. Try again.',
+  },
+  unavailable: {
+    id: 'serviceAccounts.token.create.unavailable',
+    defaultMessage:
+      'Service access token creation is not available in this environment yet. Try again after the SSO update is deployed.',
+  },
+  unexpectedResponse: {
+    id: 'serviceAccounts.token.create.unexpectedResponse',
+    defaultMessage:
+      'The server did not confirm a service access token. Check the service account list before trying again.',
   },
   success: {
     id: 'serviceAccounts.token.credentials.success',
@@ -88,7 +99,9 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [error, setError] = useState<
+    'request' | 'unexpected' | 'unavailable' | null
+  >(null);
   const [credentials, setCredentials] =
     useState<CreatedServiceAccessToken | null>(null);
   const [acknowledged, setAcknowledged] = useState(false);
@@ -104,14 +117,21 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
     if (!name.trim() || !description.trim() || isCreating) return;
 
     setIsCreating(true);
-    setHasError(false);
+    setError(null);
     try {
       const result = await createToken(name.trim(), description.trim());
       if (!result.username || !result.token)
         throw new Error('Missing token credentials');
       setCredentials(result);
-    } catch {
-      setHasError(true);
+    } catch (error) {
+      setError(
+        error instanceof ServiceAccessTokenUnavailableError
+          ? 'unavailable'
+          : error instanceof Error &&
+            error.message === 'Unexpected service access token response'
+          ? 'unexpected'
+          : 'request'
+      );
     } finally {
       setIsCreating(false);
     }
@@ -178,10 +198,16 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
         <Form onSubmit={submit}>
           <ModalHeader title={intl.formatMessage(messages.title)} />
           <ModalBody>
-            {hasError && (
+            {error && (
               <Alert
                 variant="danger"
-                title={intl.formatMessage(messages.error)}
+                title={intl.formatMessage(
+                  error === 'unavailable'
+                    ? messages.unavailable
+                    : error === 'unexpected'
+                    ? messages.unexpectedResponse
+                    : messages.error
+                )}
               />
             )}
             <FormGroup
@@ -194,6 +220,7 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
                 value={name}
                 onChange={(_event, value) => setName(value)}
                 isRequired
+                maxLength={50}
                 autoFocus
               />
             </FormGroup>
@@ -207,6 +234,7 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
                 value={description}
                 onChange={(_event, value) => setDescription(value)}
                 isRequired
+                maxLength={255}
               />
             </FormGroup>
           </ModalBody>

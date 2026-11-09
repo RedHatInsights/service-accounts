@@ -173,9 +173,6 @@
   "serviceAccounts.table.empty.title": {
     "defaultMessage": "No results found"
   },
-  "serviceAccounts.table.filter.clientIdOrUsernamePlaceholder": {
-    "defaultMessage": "Filter by client ID or username"
-  },
   "serviceAccounts.table.filter.clientIdPlaceholder": {
     "defaultMessage": "Filter by client ID"
   },
@@ -208,6 +205,12 @@
   },
   "serviceAccounts.token.create.title": {
     "defaultMessage": "Create a service access token"
+  },
+  "serviceAccounts.token.create.unavailable": {
+    "defaultMessage": "Service access token creation is not available in this environment yet. Try again after the SSO update is deployed."
+  },
+  "serviceAccounts.token.create.unexpectedResponse": {
+    "defaultMessage": "The server did not confirm a service access token. Check the service account list before trying again."
   },
   "serviceAccounts.token.credentials.acknowledge": {
     "defaultMessage": "I have copied the username and token"
