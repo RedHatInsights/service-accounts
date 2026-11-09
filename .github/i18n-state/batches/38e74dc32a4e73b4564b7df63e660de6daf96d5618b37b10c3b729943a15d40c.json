@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "key": "38e74dc32a4e73b4564b7df63e660de6daf96d5618b37b10c3b729943a15d40c",
-  "phase": "ready",
+  "phase": "superseded",
   "repository": "RedHatInsights/service-accounts",
   "baseRef": "main",
   "sourceCommit": "eee227fdedc02e33e683fde2b9f96225e228d927",
@@ -245,5 +245,6 @@
       "phase": "pending"
     }
   },
-  "importAsyncRequestId": "1911299657"
+  "importAsyncRequestId": "1911299657",
+  "failureReason": "Source catalog changed on the recorded PR base ref"
 }
