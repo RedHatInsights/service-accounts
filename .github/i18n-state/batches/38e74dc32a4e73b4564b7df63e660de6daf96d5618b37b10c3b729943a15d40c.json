@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "key": "38e74dc32a4e73b4564b7df63e660de6daf96d5618b37b10c3b729943a15d40c",
-  "phase": "importing",
+  "phase": "ready",
   "repository": "RedHatInsights/service-accounts",
   "baseRef": "main",
   "sourceCommit": "eee227fdedc02e33e683fde2b9f96225e228d927",
@@ -47,99 +47,187 @@
   "jobs": [
     {
       "uid": "qPPiIYKAmYVK12w50SPOz1",
+      "innerId": "33",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "zh_cn",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "service-accounts.ui.en.json",
       "fullFilename": "service-accounts.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-09T05:24:27+0000",
+      "wordsCount": 356,
+      "beginIndex": 0,
+      "endIndex": 75,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-09T05:24:27+0000",
+      "jobReference": {
+        "uid": "4gm185wc7KkPkaiRlu81d9",
+        "filename": "service-accounts.ui.en.json",
+        "fullFilename": "service-accounts.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "BtI1qLIs0ZFg0ECFH61DWM"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "DaF1hz3sM15cAlYG1_dc11"
     },
     {
       "uid": "YaUheLl1ZpMblWlEN6SVM7",
+      "innerId": "34",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "fr",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "service-accounts.ui.en.json",
       "fullFilename": "service-accounts.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-09T05:24:28+0000",
+      "wordsCount": 356,
+      "beginIndex": 0,
+      "endIndex": 75,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-09T05:24:28+0000",
+      "jobReference": {
+        "uid": "esiNidSJQyFE4xq22h8pE3",
+        "filename": "service-accounts.ui.en.json",
+        "fullFilename": "service-accounts.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "BtI1qLIs0ZFg0ECFH61DWM"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "yxcWll7OrYd3p5Lq_dc12"
     },
     {
       "uid": "iO4ESIDueaaSfZPdpzMHH0",
+      "innerId": "35",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "ko",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "service-accounts.ui.en.json",
       "fullFilename": "service-accounts.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-09T05:24:28+0000",
+      "wordsCount": 356,
+      "beginIndex": 0,
+      "endIndex": 75,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-09T05:24:28+0000",
+      "jobReference": {
+        "uid": "bZxkADFDY1RLoOMGPccCL6",
+        "filename": "service-accounts.ui.en.json",
+        "fullFilename": "service-accounts.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "BtI1qLIs0ZFg0ECFH61DWM"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "qZK1FJ6hGXe6OauR0_dc11"
     },
     {
       "uid": "ZesUN7eP5bEa3dBkzEMN92",
+      "innerId": "36",
       "status": "NEW",
       "providers": [],
+      "sourceLang": "en_us",
       "targetLang": "ja",
       "workflowLevel": 1,
       "workflowStep": {
         "name": "Translation",
         "id": "225677",
-        "uid": "Vm1j1nqsDSxM343cSZb17g",
         "order": 10,
-        "lqaEnabled": true
+        "workflowLevel": 1
       },
       "filename": "service-accounts.ui.en.json",
       "fullFilename": "service-accounts.ui.en.json",
       "dateDue": null,
-      "dateCreated": "2026-11-09T05:24:28+0000",
+      "wordsCount": 356,
+      "beginIndex": 0,
+      "endIndex": 75,
+      "isParentJobSplit": false,
       "updateSourceDate": null,
-      "imported": false,
-      "jobAssignedEmailTemplate": null,
-      "notificationIntervalInMinutes": 0,
+      "updateTargetDate": null,
+      "dateCreated": "2026-11-09T05:24:28+0000",
+      "jobReference": {
+        "uid": "iSDDIqhf1APBgyf55xvux1",
+        "filename": "service-accounts.ui.en.json",
+        "fullFilename": "service-accounts.ui.en.json"
+      },
+      "project": {
+        "name": "hcc-ui",
+        "uid": "LFsYhKphLpXQ0WWa47VZ19"
+      },
+      "lastWorkflowLevel": 1,
+      "workUnit": null,
+      "importStatus": {
+        "status": "OK",
+        "errorMessage": null
+      },
+      "imported": true,
       "continuous": false,
-      "sourceFileUid": "BtI1qLIs0ZFg0ECFH61DWM"
+      "continuousJobInfo": null,
+      "originalFileDirectory": "",
+      "allWorkflowStepsSplit": true,
+      "serverTaskId": "sbZF6aSMFI83p5Lq_dc11"
     }
   ],
   "warningCount": 0,
