@@ -142,6 +142,8 @@ export const SatFlagDisabled: Story = {
     expect(
       canvas.queryByRole('columnheader', { name: 'Client ID / Username' })
     ).not.toBeInTheDocument();
+    expect(canvas.queryByText('Token')).not.toBeInTheDocument();
+    expect(canvas.queryByText('client-sat-006')).not.toBeInTheDocument();
   },
 };
 

@@ -362,34 +362,33 @@ export const ServiceAccountsTable: FunctionComponent<
 
   const rows: DataViewTr[] = useMemo(
     () =>
-      serviceAccounts.map((sa) => ({
-        row: [
-          sa.type === 'service_access_token' ? (
-            <div>
-              {sa.name}
-              <div className="pf-v6-u-mt-xs">
-                <Label color={TOKEN_LABEL_COLOR}>
-                  {intl.formatMessage(messages.tokenLabel)}
-                </Label>
+      serviceAccounts
+        .filter((sa) => isSatEnabled || sa.type !== 'service_access_token')
+        .map((sa) => ({
+          row: [
+            sa.type === 'service_access_token' ? (
+              <div>
+                {sa.name}
+                <div className="pf-v6-u-mt-xs">
+                  <Label color={TOKEN_LABEL_COLOR}>
+                    {intl.formatMessage(messages.tokenLabel)}
+                  </Label>
+                </div>
               </div>
-            </div>
-          ) : (
-            sa.name
-          ),
-          sa.description,
-          sa.clientId,
-          sa.createdBy,
-          <DateFormat key={`date-${sa.id}`} date={sa.createdAt * 1000} />,
-          {
-            cell:
-              sa.type === 'service_access_token' && !isSatEnabled ? null : (
-                <ActionsColumn items={getRowActions(sa)} />
-              ),
-            props: { isActionCell: true },
-          },
-        ],
-        id: sa.id,
-      })),
+            ) : (
+              sa.name
+            ),
+            sa.description,
+            sa.clientId,
+            sa.createdBy,
+            <DateFormat key={`date-${sa.id}`} date={sa.createdAt * 1000} />,
+            {
+              cell: <ActionsColumn items={getRowActions(sa)} />,
+              props: { isActionCell: true },
+            },
+          ],
+          id: sa.id,
+        })),
     [serviceAccounts, getRowActions, intl, isSatEnabled]
   );
 

@@ -915,14 +915,13 @@ export const ServiceAccessTokenResetFlagDisabled: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() =>
-      expect(canvas.getByText('build-token')).toBeInTheDocument()
+      expect(canvas.getByText('No service accounts yet')).toBeInTheDocument()
     );
     await waitFor(() =>
       expect(
         within(document.body).queryByRole('dialog')
       ).not.toBeInTheDocument()
     );
-    const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
-    expect(row.querySelector('button')).toBeNull();
+    expect(canvas.queryByText('build-token')).not.toBeInTheDocument();
   },
 };

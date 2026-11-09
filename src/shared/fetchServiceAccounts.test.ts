@@ -384,3 +384,61 @@ describe('fetchServiceAccounts - N+1 pagination pattern', () => {
     );
   });
 });
+
+describe('fetchServiceAccounts with service access tokens hidden', () => {
+  const options = {
+    token: 'test-token',
+    sso: 'https://sso.example.com/auth/',
+    perPage: 2,
+    excludeServiceAccessTokens: true,
+  };
+
+  it('fills a page with service accounts beyond a full page of tokens', async () => {
+    const tokens = Array.from({ length: 100 }, (_, index) => ({
+      id: `token-${index}`,
+      type: 'service_access_token',
+    }));
+    const accounts = [
+      { id: 'sa-1', type: 'service_account' },
+      { id: 'sa-2', type: 'service_account' },
+      { id: 'sa-3', type: 'service_account' },
+    ];
+    global.fetch = jest
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(tokens) })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(accounts),
+      });
+
+    await expect(fetchServiceAccounts(options)).resolves.toEqual({
+      serviceAccounts: accounts.slice(0, 2),
+      hasMore: true,
+    });
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining('first=100&max=100'),
+      expect.any(Object)
+    );
+  });
+
+  it('paginates by visible service accounts', async () => {
+    const accounts = [
+      { id: 'sa-1', type: 'service_account' },
+      { id: 'sat-1', type: 'service_access_token' },
+      { id: 'sa-2', type: 'service_account' },
+      { id: 'sa-3', type: 'service_account' },
+    ];
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(accounts),
+    });
+
+    await expect(
+      fetchServiceAccounts({ ...options, page: 2 })
+    ).resolves.toEqual({
+      serviceAccounts: [accounts[3]],
+      hasMore: false,
+    });
+  });
+});

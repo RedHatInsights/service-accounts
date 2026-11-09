@@ -85,7 +85,15 @@ const ListServiceAccountsPage = () => {
   const refreshServiceAccounts = () =>
     queryClient.invalidateQueries({ queryKey: ['service-accounts'] });
   const results = useQuery({
-    queryKey: ['service-accounts', page, perPage, orderBy, sortOrder, filters],
+    queryKey: [
+      'service-accounts',
+      page,
+      perPage,
+      orderBy,
+      sortOrder,
+      filters,
+      isSatEnabled,
+    ],
     queryFn: async () => {
       const env = getEnvironmentDetails();
       const token = await auth.getToken();
@@ -97,6 +105,7 @@ const ListServiceAccountsPage = () => {
         orderBy,
         sortOrder,
         filters,
+        excludeServiceAccessTokens: !isSatEnabled,
       });
       response.serviceAccounts.forEach((sa) =>
         queryClient.setQueryData(['service-account', sa.id], sa)

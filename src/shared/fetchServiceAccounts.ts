@@ -17,6 +17,7 @@ type Options = {
   orderBy?: SortByField;
   sortOrder?: SortOrder;
   filters?: ServiceAccountFilters;
+  excludeServiceAccessTokens?: boolean;
 };
 
 export function buildQueryParams(options: {
@@ -65,6 +66,7 @@ export async function fetchServiceAccounts({
   orderBy,
   sortOrder,
   filters,
+  excludeServiceAccessTokens = false,
 }: Options): Promise<{
   serviceAccounts: ServiceAccount[];
   hasMore: boolean;
@@ -72,32 +74,55 @@ export async function fetchServiceAccounts({
   const sanitizedPage = Math.max(1, Math.floor(page));
   const sanitizedPerPage = Math.max(1, Math.floor(perPage));
 
-  const first = (sanitizedPage - 1) * sanitizedPerPage;
   const baseUrl = `${sso}realms/redhat-external/apis/service_accounts/v1`;
+  const fetchPage = async (first: number, max: number) => {
+    const queryParams = buildQueryParams({
+      first,
+      max,
+      orderBy,
+      sortOrder,
+      filters,
+    });
+    const response = await fetch(`${baseUrl}?${queryParams}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const queryParams = buildQueryParams({
-    first,
-    max: sanitizedPerPage + 1,
-    orderBy,
-    sortOrder,
-    filters,
-  });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch service accounts (${response.status})`);
+    }
 
-  const response = await fetch(`${baseUrl}?${queryParams}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const data: ServiceAccount[] = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Unexpected service accounts response shape');
+    }
+    return data;
+  };
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch service accounts (${response.status})`);
+  if (excludeServiceAccessTokens) {
+    // The list API has no type filter, so scan its pages before paginating visible rows.
+    const firstVisible = (sanitizedPage - 1) * sanitizedPerPage;
+    const visible: ServiceAccount[] = [];
+    let first = 0;
+    const max = 100;
+
+    while (visible.length <= firstVisible + sanitizedPerPage) {
+      const data = await fetchPage(first, max);
+      visible.push(...data.filter((sa) => sa.type !== 'service_access_token'));
+      first += data.length;
+      if (data.length < max) break;
+    }
+
+    return {
+      serviceAccounts: visible.slice(
+        firstVisible,
+        firstVisible + sanitizedPerPage
+      ),
+      hasMore: visible.length > firstVisible + sanitizedPerPage,
+    };
   }
 
-  const data: ServiceAccount[] = await response.json();
-
-  if (!Array.isArray(data)) {
-    throw new Error('Unexpected service accounts response shape');
-  }
+  const first = (sanitizedPage - 1) * sanitizedPerPage;
+  const data = await fetchPage(first, sanitizedPerPage + 1);
 
   const hasMore = data.length > sanitizedPerPage;
 
