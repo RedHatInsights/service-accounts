@@ -30,7 +30,10 @@ import {
 } from '@patternfly/react-data-view/dist/dynamic/DataViewTable';
 import { DataViewToolbar } from '@patternfly/react-data-view/dist/dynamic/DataViewToolbar';
 import DataViewFilters from '@patternfly/react-data-view/dist/cjs/DataViewFilters';
-import { DataViewTextFilter } from '@patternfly/react-data-view';
+import {
+  DataViewCheckboxFilter,
+  DataViewTextFilter,
+} from '@patternfly/react-data-view';
 import { useDataViewPagination } from '@patternfly/react-data-view/dist/dynamic/Hooks';
 import { ActionsColumn, Tbody, Td, ThProps, Tr } from '@patternfly/react-table';
 import {
@@ -44,22 +47,27 @@ import { useFlag } from '@unleash/proxy-client-react';
 import { defineMessages, useIntl } from 'react-intl';
 import { mergeToBasename } from '../../shared/utils';
 import { ServiceAccount } from '../../types';
+import {
+  SERVICE_ACCOUNT_TYPE_OPTIONS,
+  isValidServiceAccountType,
+} from '../../shared/serviceAccountTypes';
 import { SortByField, SortOrder } from '../../shared/fetchServiceAccounts';
 import {
   DEFAULT_SORT_FIELD,
   DEFAULT_SORT_ORDER,
   FILTER_DEBOUNCE_MS,
-  FILTER_KEYS,
-  FilterKey,
   OUIA_ID,
   PER_PAGE_OPTIONS,
   SORT_FIELD_MAP,
   SORT_FIELD_TO_INDEX,
+  TEXT_FILTER_KEYS,
+  TextFilterKey,
 } from './constants';
 import {
   createClearFiltersParamsUpdater,
   createFiltersParamsUpdater,
   createSortParamsUpdater,
+  createTypeFilterParamsUpdater,
 } from './urlParams';
 import { CreateCredentialButton } from './CreateCredentialButton';
 
@@ -103,6 +111,14 @@ const messages = defineMessages({
   filterOwnerPlaceholder: {
     id: 'serviceAccounts.table.filter.ownerPlaceholder',
     defaultMessage: 'Filter by owner',
+  },
+  filterTypeTitle: {
+    id: 'serviceAccounts.table.filter.typeTitle',
+    defaultMessage: 'Type',
+  },
+  filterTypePlaceholder: {
+    id: 'serviceAccounts.table.filter.typePlaceholder',
+    defaultMessage: 'Filter by type',
   },
   tableAriaLabel: {
     id: 'serviceAccounts.table.ariaLabel',
@@ -233,7 +249,7 @@ export const ServiceAccountsTable: FunctionComponent<
     [isSortingEnabled, activeSortIndex, activeSortDirection, handleSort]
   );
 
-  const urlFilters = useMemo(
+  const urlTextFilters = useMemo(
     () => ({
       name: searchParams.get('name') || '',
       clientId: searchParams.get('clientId') || '',
@@ -242,14 +258,21 @@ export const ServiceAccountsTable: FunctionComponent<
     [searchParams]
   );
 
+  /** Type filter value read from URL (not debounced). */
+  const typeFilterValue = useMemo(() => {
+    if (!isSatEnabled) return '';
+    const raw = searchParams.get('type') || '';
+    return isValidServiceAccountType(raw) ? raw : '';
+  }, [searchParams, isSatEnabled]);
+
   const [filterInputs, setFilterInputs] =
-    useState<Record<FilterKey, string>>(urlFilters);
+    useState<Record<TextFilterKey, string>>(urlTextFilters);
 
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setFilterInputs(urlFilters);
-  }, [urlFilters]);
+    setFilterInputs(urlTextFilters);
+  }, [urlTextFilters]);
 
   useEffect(() => {
     return () => {
@@ -260,14 +283,14 @@ export const ServiceAccountsTable: FunctionComponent<
   }, []);
 
   const updateUrlWithFilters = useCallback(
-    (newFilters: Record<FilterKey, string>) => {
+    (newFilters: Record<TextFilterKey, string>) => {
       setSearchParams(createFiltersParamsUpdater(newFilters));
     },
     [setSearchParams]
   );
 
-  const handleFilterChange = useCallback(
-    (key: FilterKey, value: string) => {
+  const handleTextFilterChange = useCallback(
+    (key: TextFilterKey, value: string) => {
       const newFilters = { ...filterInputs, [key]: value };
       setFilterInputs(newFilters);
 
@@ -282,14 +305,32 @@ export const ServiceAccountsTable: FunctionComponent<
     [filterInputs, updateUrlWithFilters]
   );
 
+  /**
+   * Handle type filter selection.  Enforces single-select: when a second
+   * option is checked the older one is replaced, not appended.
+   */
+  const handleTypeFilterChange = useCallback(
+    (_event: React.MouseEvent | undefined, values: string[] | undefined) => {
+      let newType = '';
+      if (values && values.length === 1) {
+        newType = values[0];
+      } else if (values && values.length > 1) {
+        // Take the newly-added option (the one not currently selected).
+        newType = values.find((v) => v !== typeFilterValue) || values[0];
+      }
+      setSearchParams(createTypeFilterParamsUpdater(newType));
+    },
+    [typeFilterValue, setSearchParams]
+  );
+
   const clearAllFilters = useCallback(() => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    const clearedFilters = FILTER_KEYS.reduce(
+    const clearedFilters = TEXT_FILTER_KEYS.reduce(
       (acc, key) => ({ ...acc, [key]: '' }),
-      {} as Record<FilterKey, string>
+      {} as Record<TextFilterKey, string>
     );
     setFilterInputs(clearedFilters);
 
@@ -297,8 +338,11 @@ export const ServiceAccountsTable: FunctionComponent<
   }, [setSearchParams]);
 
   const hasActiveFilters = useMemo(
-    () => isFilteringEnabled && FILTER_KEYS.some((key) => filterInputs[key]),
-    [isFilteringEnabled, filterInputs]
+    () =>
+      isFilteringEnabled &&
+      (TEXT_FILTER_KEYS.some((key) => filterInputs[key]) ||
+        (isSatEnabled && !!typeFilterValue)),
+    [isFilteringEnabled, isSatEnabled, filterInputs, typeFilterValue]
   );
 
   const canChange = useCallback(
@@ -477,10 +521,25 @@ export const ServiceAccountsTable: FunctionComponent<
             <DataViewFilters
               onChange={(_e, values) => {
                 Object.entries(values).forEach(([key, value]) => {
-                  handleFilterChange(key as FilterKey, value as string);
+                  if (key === 'type') {
+                    handleTypeFilterChange(
+                      undefined,
+                      value as unknown as string[]
+                    );
+                  } else {
+                    handleTextFilterChange(
+                      key as TextFilterKey,
+                      value as string
+                    );
+                  }
                 });
               }}
-              values={filterInputs}
+              values={{
+                ...filterInputs,
+                ...(isSatEnabled && {
+                  type: typeFilterValue ? [typeFilterValue] : [],
+                }),
+              }}
             >
               <DataViewTextFilter
                 filterId="name"
@@ -504,6 +563,17 @@ export const ServiceAccountsTable: FunctionComponent<
                 )}
                 ouiaId={`${OUIA_ID}-filter-creator`}
               />
+              {isSatEnabled && (
+                <DataViewCheckboxFilter
+                  filterId="type"
+                  title={intl.formatMessage(messages.filterTypeTitle)}
+                  placeholder={intl.formatMessage(
+                    messages.filterTypePlaceholder
+                  )}
+                  options={SERVICE_ACCOUNT_TYPE_OPTIONS}
+                  ouiaId={`${OUIA_ID}-filter-type`}
+                />
+              )}
             </DataViewFilters>
           ) : undefined
         }
