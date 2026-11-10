@@ -23,16 +23,24 @@ export async function resetServiceAccount({
   sso,
   expectedSatUsername,
 }: Options): Promise<NewServiceAccount> {
-  const response = await fetch(
-    `${sso}realms/redhat-external/apis/service_accounts/v1/${clientId}/resetSecret`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'content-type': 'application/json',
-      },
-      method: 'POST',
+  let response: Response;
+  try {
+    response = await fetch(
+      `${sso}realms/redhat-external/apis/service_accounts/v1/${clientId}/resetSecret`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      }
+    );
+  } catch (error) {
+    if (expectedSatUsername !== undefined) {
+      throw new UnexpectedServiceAccessTokenResetResponseError();
     }
-  );
+    throw error;
+  }
   if (!response.ok && expectedSatUsername !== undefined) {
     throw new Error(`Failed to reset credentials (${response.status})`);
   }

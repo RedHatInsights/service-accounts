@@ -162,4 +162,33 @@ describe('resetServiceAccount', () => {
       })
     ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
   });
+
+  it('treats a rejected SAT reset POST as an uncertain result', async () => {
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: '|service-account-client-123',
+      })
+    ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+  });
+
+  it('preserves a rejected ordinary service-account reset POST', async () => {
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+      })
+    ).rejects.toThrow('Failed to fetch');
+  });
 });

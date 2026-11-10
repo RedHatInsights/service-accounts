@@ -54,6 +54,9 @@ const ResetServiceAccountPage = () => {
     onError: (error) => {
       if (error instanceof UnexpectedServiceAccessTokenResetResponseError) {
         queryClient.invalidateQueries({ queryKey: ['service-accounts'] });
+        queryClient.invalidateQueries({
+          queryKey: ['service-account', clientId],
+        });
       }
     },
   });
