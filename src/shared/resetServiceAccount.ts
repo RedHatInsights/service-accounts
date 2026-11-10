@@ -42,6 +42,9 @@ export async function resetServiceAccount({
     throw error;
   }
   if (!response.ok && expectedSatUsername !== undefined) {
+    if (response.status === 408 || response.status >= 500) {
+      throw new UnexpectedServiceAccessTokenResetResponseError();
+    }
     throw new Error(`Failed to reset credentials (${response.status})`);
   }
 

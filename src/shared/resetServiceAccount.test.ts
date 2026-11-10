@@ -116,6 +116,25 @@ describe('resetServiceAccount', () => {
     ).rejects.toThrow('Failed to reset credentials (403)');
   });
 
+  it.each([408, 500, 504])(
+    'treats an HTTP %s SAT reset response as an uncertain result',
+    async (status) => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: false,
+        status,
+      });
+
+      await expect(
+        resetServiceAccount({
+          clientId: mockClientId,
+          token: mockToken,
+          sso: mockSso,
+          expectedSatUsername: '|service-account-client-123',
+        })
+      ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+    }
+  );
+
   it.each([
     {
       type: 'service_access_token',
