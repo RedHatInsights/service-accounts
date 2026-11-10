@@ -2,6 +2,7 @@ import {
   createClearFiltersParamsUpdater,
   createFiltersParamsUpdater,
   createSortParamsUpdater,
+  createTypeFilterParamsUpdater,
 } from './urlParams';
 
 describe('urlParams - multiple API calls fix', () => {
@@ -74,13 +75,62 @@ describe('urlParams - multiple API calls fix', () => {
       expect(result.get('clientId')).toBe('client-123');
       expect(result.get('page')).toBe('1');
     });
+
+    it('does not touch type param (handled separately)', () => {
+      const updater = createFiltersParamsUpdater({
+        name: 'test',
+        clientId: '',
+        creator: '',
+      });
+      const prev = new URLSearchParams('?type=service_account&page=2');
+
+      const result = updater(prev);
+
+      expect(result.get('name')).toBe('test');
+      expect(result.get('type')).toBe('service_account');
+      expect(result.get('page')).toBe('1');
+    });
+  });
+
+  describe('createTypeFilterParamsUpdater', () => {
+    it('sets type param and resets page to 1', () => {
+      const updater = createTypeFilterParamsUpdater('service_account');
+      const prev = new URLSearchParams('?page=3');
+
+      const result = updater(prev);
+
+      expect(result.get('type')).toBe('service_account');
+      expect(result.get('page')).toBe('1');
+    });
+
+    it('removes type param when empty and resets page', () => {
+      const updater = createTypeFilterParamsUpdater('');
+      const prev = new URLSearchParams('?type=service_account&page=2');
+
+      const result = updater(prev);
+
+      expect(result.get('type')).toBeNull();
+      expect(result.get('page')).toBe('1');
+    });
+
+    it('preserves other params', () => {
+      const updater = createTypeFilterParamsUpdater('service_access_token');
+      const prev = new URLSearchParams('?name=test&perPage=20');
+
+      const result = updater(prev);
+
+      expect(result.get('type')).toBe('service_access_token');
+      expect(result.get('name')).toBe('test');
+      expect(result.get('perPage')).toBe('20');
+      expect(result.get('page')).toBe('1');
+    });
   });
 
   describe('createClearFiltersParamsUpdater', () => {
-    it('removes all filter params and resets page to 1', () => {
+    it('removes all filter params including type and resets page to 1', () => {
       const updater = createClearFiltersParamsUpdater();
       const prev = new URLSearchParams(
-        '?name=test&clientId=abc&creator=user&page=3'
+        '?name=test&clientId=abc&creator=user&type=service_account&page=3'
       );
 
       const result = updater(prev);
@@ -88,18 +138,20 @@ describe('urlParams - multiple API calls fix', () => {
       expect(result.get('name')).toBeNull();
       expect(result.get('clientId')).toBeNull();
       expect(result.get('creator')).toBeNull();
+      expect(result.get('type')).toBeNull();
       expect(result.get('page')).toBe('1');
     });
 
     it('preserves non-filter params', () => {
       const updater = createClearFiltersParamsUpdater();
       const prev = new URLSearchParams(
-        '?name=test&perPage=20&orderBy=createdAt'
+        '?name=test&perPage=20&orderBy=createdAt&type=service_account'
       );
 
       const result = updater(prev);
 
       expect(result.get('name')).toBeNull();
+      expect(result.get('type')).toBeNull();
       expect(result.get('perPage')).toBe('20');
       expect(result.get('orderBy')).toBe('createdAt');
       expect(result.get('page')).toBe('1');
