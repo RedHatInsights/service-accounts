@@ -277,10 +277,18 @@
   "warningCount": 0,
   "locales": {
     "fr": {
-      "phase": "exporting",
+      "phase": "pr-created",
       "toolingCommitShas": [
         "7b2e7f3871347b99bbe7ddd3bb3afd0e79b1bfd3"
-      ]
+      ],
+      "validationErrors": [],
+      "validationWarnings": [],
+      "pullRequestBodyDigest": "536d6ae4e29d039e220f269b810ed074b8bf1be15ca196d7aef4d4b505bd7b77",
+      "pullRequestUrl": "https://github.com/RedHatInsights/service-accounts/pull/220",
+      "pullRequestBranch": "i18n/phrase-d6fced3e80d1fd07-fr",
+      "pullRequestBatchKey": "d6fced3e80d1fd07a8b38b6ed59e1434192c505feb45657fd4ca0fafa5522c26",
+      "pullRequestAssigneesPending": true,
+      "toolingCommitSha": "7b2e7f3871347b99bbe7ddd3bb3afd0e79b1bfd3"
     },
     "ja": {
       "phase": "pending"
