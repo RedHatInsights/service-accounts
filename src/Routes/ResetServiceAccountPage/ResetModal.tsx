@@ -1,4 +1,5 @@
 import {
+  Alert,
   Bullseye,
   Button,
   Content,
@@ -36,37 +37,76 @@ const messages = defineMessages({
     id: 'serviceAccounts.reset.button.cancel',
     defaultMessage: 'Cancel',
   },
+  satTitle: {
+    id: 'serviceAccounts.token.reset.title',
+    defaultMessage: 'Reset service access token credentials?',
+  },
+  satBody: {
+    id: 'serviceAccounts.token.reset.body',
+    defaultMessage:
+      'Resetting the token for {name} will make the current token stop working. The username will stay the same.',
+  },
+  satError: {
+    id: 'serviceAccounts.token.reset.error',
+    defaultMessage: 'The service access token could not be reset. Try again.',
+  },
+  satUnexpectedResponse: {
+    id: 'serviceAccounts.token.reset.unexpectedResponse',
+    defaultMessage:
+      'The server did not confirm the new token credentials. The old token may no longer work. Check the service account list before trying again.',
+  },
+  satMissingUsername: {
+    id: 'serviceAccounts.token.reset.missingUsername',
+    defaultMessage:
+      'Reset is unavailable because the service access token username could not be confirmed.',
+  },
 });
 
 export type ResetModalProps = {
   name: string | undefined;
   isResetting: boolean;
   onConfirm: () => void;
+  isSat?: boolean;
+  satError?: 'request' | 'unexpected' | 'missingUsername';
 };
 
 export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
   name,
   isResetting,
   onConfirm,
+  isSat = false,
+  satError,
 }) => {
   const navigate = useNavigate();
   const intl = useIntl();
+  const title = intl.formatMessage(isSat ? messages.satTitle : messages.title);
   return (
     <Modal
-      id="modalCreateServiceAccountReset"
       variant={ModalVariant.medium}
-      title={intl.formatMessage(messages.title)}
+      aria-label={title}
       isOpen={true}
       ouiaId={'modal-reset-service-account'}
       appendTo={appendTo}
-      onClose={() => navigate('')}
+      onClose={isSat && isResetting ? undefined : () => navigate('')}
     >
-      <ModalHeader title={intl.formatMessage(messages.title)} />
+      <ModalHeader title={title} />
       <ModalBody>
+        {isSat && satError && (
+          <Alert
+            variant="danger"
+            title={intl.formatMessage(
+              satError === 'unexpected'
+                ? messages.satUnexpectedResponse
+                : satError === 'missingUsername'
+                ? messages.satMissingUsername
+                : messages.satError
+            )}
+          />
+        )}
         {name ? (
           <Content>
             <FormattedMessage
-              {...messages.body}
+              {...(isSat ? messages.satBody : messages.body)}
               values={{
                 name: <strong>{name || <Spinner size={'sm'} />}</strong>,
               }}
@@ -86,7 +126,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           key="create"
           variant="primary"
           isLoading={isResetting}
-          isDisabled={isResetting || !name}
+          isDisabled={isResetting || !name || satError === 'missingUsername'}
           onClick={onConfirm}
           ouiaId="resetmodal-confirm-button"
         >
@@ -96,6 +136,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
           key="cancel"
           variant="link"
           component={(props) => <AppLink {...props} to={''} />}
+          isDisabled={isSat && isResetting}
           ouiaId="resetmodal-cancel-button"
         >
           {intl.formatMessage(messages.cancelButton)}

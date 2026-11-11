@@ -194,6 +194,9 @@
   "serviceAccounts.table.pagination.of": {
     "defaultMessage": "of"
   },
+  "serviceAccounts.table.tokenLabel": {
+    "defaultMessage": "Token"
+  },
   "serviceAccounts.token.create.button": {
     "defaultMessage": "Create"
   },
@@ -221,19 +224,34 @@
   "serviceAccounts.token.credentials.acknowledge": {
     "defaultMessage": "I have copied the username and token"
   },
-  "serviceAccounts.token.credentials.close": {
-    "defaultMessage": "Close"
+  "serviceAccounts.token.credentials.ariaLabel": {
+    "defaultMessage": "Service access token credentials"
+  },
+  "serviceAccounts.token.credentials.connectBody": {
+    "defaultMessage": "Connect to Red Hat cloud services or APIs using this username and token"
   },
   "serviceAccounts.token.credentials.oneTime": {
     "defaultMessage": "Copy the username and token now. The token will not be shown again after you close this window."
-  },
-  "serviceAccounts.token.credentials.success": {
-    "defaultMessage": "Service access token created"
   },
   "serviceAccounts.token.credentials.token": {
     "defaultMessage": "Token"
   },
   "serviceAccounts.token.credentials.username": {
     "defaultMessage": "Username"
+  },
+  "serviceAccounts.token.reset.body": {
+    "defaultMessage": "Resetting the token for {name} will make the current token stop working. The username will stay the same."
+  },
+  "serviceAccounts.token.reset.error": {
+    "defaultMessage": "The service access token could not be reset. Try again."
+  },
+  "serviceAccounts.token.reset.missingUsername": {
+    "defaultMessage": "Reset is unavailable because the service access token username could not be confirmed."
+  },
+  "serviceAccounts.token.reset.title": {
+    "defaultMessage": "Reset service access token credentials?"
+  },
+  "serviceAccounts.token.reset.unexpectedResponse": {
+    "defaultMessage": "The server did not confirm the new token credentials. The old token may no longer work. Check the service account list before trying again."
   }
 }

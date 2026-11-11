@@ -1,4 +1,7 @@
-import { resetServiceAccount } from './resetServiceAccount';
+import {
+  UnexpectedServiceAccessTokenResetResponseError,
+  resetServiceAccount,
+} from './resetServiceAccount';
 
 describe('resetServiceAccount', () => {
   const mockToken = 'test-token';
@@ -18,6 +21,7 @@ describe('resetServiceAccount', () => {
     };
 
     global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve(mockResetResponse),
     });
 
@@ -32,6 +36,7 @@ describe('resetServiceAccount', () => {
 
   it('should call fetch with correct URL including resetSecret endpoint', async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({}),
     });
 
@@ -51,5 +56,158 @@ describe('resetServiceAccount', () => {
         },
       })
     );
+  });
+
+  it('preserves the service-account error response for the existing credentials modal', async () => {
+    const errorResponse = {
+      error: 'reset_denied',
+      error_description: 'Access denied',
+    };
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      json: () => Promise.resolve(errorResponse),
+    });
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+      })
+    ).resolves.toEqual(errorResponse);
+  });
+
+  it('returns a SAT reset only when the new secret and unchanged username are confirmed', async () => {
+    const sat = {
+      type: 'service_access_token',
+      serviceAccessTokenId: '|service-account-client-123',
+      secret: 'new-token',
+      expiresAt: 1800000000,
+    };
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(sat),
+    });
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: sat.serviceAccessTokenId,
+      })
+    ).resolves.toEqual(sat);
+  });
+
+  it('rejects a failed SAT reset without showing credentials', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+    });
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: '|service-account-client-123',
+      })
+    ).rejects.toThrow('Failed to reset credentials (403)');
+  });
+
+  it.each([408, 500, 504])(
+    'treats an HTTP %s SAT reset response as an uncertain result',
+    async (status) => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: false,
+        status,
+      });
+
+      await expect(
+        resetServiceAccount({
+          clientId: mockClientId,
+          token: mockToken,
+          sso: mockSso,
+          expectedSatUsername: '|service-account-client-123',
+        })
+      ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+    }
+  );
+
+  it.each([
+    {
+      type: 'service_access_token',
+      serviceAccessTokenId: '|service-account-client-123',
+    },
+    {
+      type: 'service_access_token',
+      serviceAccessTokenId: '|service-account-changed',
+      secret: 'new-token',
+    },
+    {
+      type: 'service_account',
+      serviceAccessTokenId: '|service-account-client-123',
+      secret: 'new-token',
+    },
+  ])('rejects an unconfirmed SAT reset response', async (body) => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(body),
+    });
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: '|service-account-client-123',
+      })
+    ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+  });
+
+  it('treats unreadable successful SAT reset JSON as an uncertain result', async () => {
+    global.fetch = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.reject(new SyntaxError('Invalid JSON')),
+    });
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: '|service-account-client-123',
+      })
+    ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+  });
+
+  it('treats a rejected SAT reset POST as an uncertain result', async () => {
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+        expectedSatUsername: '|service-account-client-123',
+      })
+    ).rejects.toBeInstanceOf(UnexpectedServiceAccessTokenResetResponseError);
+  });
+
+  it('preserves a rejected ordinary service-account reset POST', async () => {
+    global.fetch = jest
+      .fn()
+      .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+    await expect(
+      resetServiceAccount({
+        clientId: mockClientId,
+        token: mockToken,
+        sso: mockSso,
+      })
+    ).rejects.toThrow('Failed to fetch');
   });
 });

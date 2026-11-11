@@ -45,6 +45,16 @@ const mockServiceAccounts: ServiceAccount[] = [
     name: 'backup-service',
     description: 'Automated backup service account',
   },
+  {
+    id: 'sat-006',
+    clientId: 'client-sat-006',
+    type: 'service_access_token',
+    serviceAccessTokenId: '|service-account-client-sat-006',
+    createdAt: 1714521600,
+    createdBy: 'john.doe',
+    name: 'build-token',
+    description: 'Build access',
+  },
 ];
 
 const meta: Meta<typeof ServiceAccountsTable> = {
@@ -107,6 +117,13 @@ export const Default: Story = {
       canvas.getByRole('columnheader', { name: 'Client ID / Username' })
     ).toBeInTheDocument();
     expect(canvas.getByText('client-abc-123')).toBeInTheDocument();
+    expect(canvas.getByText('client-sat-006')).toBeInTheDocument();
+    expect(
+      canvas.queryByText('|service-account-client-sat-006')
+    ).not.toBeInTheDocument();
+    const tokenLabel = canvas.getByText('Token');
+    expect(tokenLabel).toBeInTheDocument();
+    expect(tokenLabel.closest('.pf-v6-c-label')).toHaveClass('pf-m-blue');
   },
 };
 
@@ -125,6 +142,8 @@ export const SatFlagDisabled: Story = {
     expect(
       canvas.queryByRole('columnheader', { name: 'Client ID / Username' })
     ).not.toBeInTheDocument();
+    expect(canvas.queryByText('Token')).not.toBeInTheDocument();
+    expect(canvas.queryByText('client-sat-006')).not.toBeInTheDocument();
   },
 };
 

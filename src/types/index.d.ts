@@ -10,6 +10,7 @@ export type ServiceAccount = {
   clientId: string;
   type?: 'service_access_token';
   serviceAccessTokenId?: string;
+  expiresAt?: number;
   createdAt: number;
   createdBy: string;
   name: string;

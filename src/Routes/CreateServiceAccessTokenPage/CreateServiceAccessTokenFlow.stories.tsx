@@ -69,7 +69,9 @@ export const CreateAndCopyOnce: Story = {
     await userEvent.click(create);
 
     await waitFor(() =>
-      expect(page.getByText('Service access token created')).toBeInTheDocument()
+      expect(
+        page.getByText('Credentials successfully generated')
+      ).toBeInTheDocument()
     );
     expect(
       page.getByDisplayValue('|service-account-client-demo')
@@ -113,7 +115,7 @@ export const FailedCreation: Story = {
       ).toBeInTheDocument()
     );
     expect(
-      page.queryByText('Service access token created')
+      page.queryByText('Credentials successfully generated')
     ).not.toBeInTheDocument();
   },
 };
@@ -134,7 +136,7 @@ export const UnsupportedBackend: Story = {
       ).toBeInTheDocument()
     );
     expect(
-      page.queryByText('Service access token created')
+      page.queryByText('Credentials successfully generated')
     ).not.toBeInTheDocument();
   },
 };
