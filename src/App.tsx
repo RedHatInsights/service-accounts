@@ -16,8 +16,9 @@ const App = () => {
 
   return (
     <IntlMessagesProvider locale={locale}>
-      <NotificationsProvider />
-      <Routes />
+      <NotificationsProvider>
+        <Routes />
+      </NotificationsProvider>
     </IntlMessagesProvider>
   );
 };

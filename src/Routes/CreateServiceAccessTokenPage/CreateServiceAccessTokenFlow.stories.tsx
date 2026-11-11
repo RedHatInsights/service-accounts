@@ -61,7 +61,18 @@ export const CreateAndCopyOnce: Story = {
     const create = page.getByRole('button', { name: 'Create' });
     expect(create).toBeDisabled();
 
-    await userEvent.type(page.getByLabelText(/Name/), 'automation-token');
+    await userEvent.click(
+      page.getByRole('button', { name: 'name of service access token' })
+    );
+    expect(
+      await page.findByText(
+        'Please provide a simple and short name for the service access token you are creating'
+      )
+    ).toBeInTheDocument();
+    await userEvent.type(
+      page.getByRole('textbox', { name: /^Service access token name/ }),
+      'automation-token'
+    );
     await userEvent.type(
       page.getByLabelText(/Short description/),
       'Build access'
@@ -101,7 +112,10 @@ export const FailedCreation: Story = {
   args: { shouldFail: true },
   play: async () => {
     const page = within(document.body);
-    await userEvent.type(page.getByLabelText(/Name/), 'automation-token');
+    await userEvent.type(
+      page.getByRole('textbox', { name: /^Service access token name/ }),
+      'automation-token'
+    );
     await userEvent.type(
       page.getByLabelText(/Short description/),
       'Build access'
@@ -124,7 +138,10 @@ export const UnsupportedBackend: Story = {
   args: { unsupportedBackend: true },
   play: async () => {
     const page = within(document.body);
-    await userEvent.type(page.getByLabelText(/Name/), 'automation-token');
+    await userEvent.type(
+      page.getByRole('textbox', { name: /^Service access token name/ }),
+      'automation-token'
+    );
     await userEvent.type(
       page.getByLabelText(/Short description/),
       'Build access'

@@ -136,6 +136,10 @@ const messages = defineMessages({
     id: 'serviceAccounts.table.action.delete',
     defaultMessage: 'Delete service account',
   },
+  actionDeleteToken: {
+    id: 'serviceAccounts.table.action.deleteToken',
+    defaultMessage: 'Delete service access token',
+  },
   paginationOf: {
     id: 'serviceAccounts.table.pagination.of',
     defaultMessage: 'of',
@@ -390,7 +394,21 @@ export const ServiceAccountsTable: FunctionComponent<
         onClick: () => navigate(mergeToBasename(`reset/${sa.id}`)),
       };
       return sa.type === 'service_access_token'
-        ? [reset]
+        ? [
+            reset,
+            {
+              title: intl.formatMessage(messages.actionDeleteToken),
+              isDisabled: !canChange(sa),
+              ouiaId: 'delete-service-access-token-button',
+              onClick: () =>
+                navigate(
+                  mergeToBasename({
+                    pathname: `delete/${sa.id}`,
+                    search: searchParams.toString(),
+                  })
+                ),
+            },
+          ]
         : [
             reset,
             {
@@ -401,7 +419,7 @@ export const ServiceAccountsTable: FunctionComponent<
             },
           ];
     },
-    [canChange, navigate, intl]
+    [canChange, navigate, intl, searchParams]
   );
 
   const rows: DataViewTr[] = useMemo(

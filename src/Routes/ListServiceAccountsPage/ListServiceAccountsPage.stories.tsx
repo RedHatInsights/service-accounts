@@ -343,6 +343,7 @@ Complete end-to-end user flows for the Service Accounts application.
 - **Create Service Account Journey**: Full create flow with validation
 - **Create Service Access Token Journey**: SAT create request and one-time credential reveal
 - **Delete Service Account Journey**: Full delete flow with confirmation
+- **Delete Service Access Token Journey**: SAT deletion, cancellation, and failure
 - **Reset Service Account Journey**: Full reset credentials flow
 - **Reset Service Access Token Journey**: SAT warning and one-time token reveal
         `,
@@ -405,12 +406,15 @@ export const CreateServiceAccessTokenJourney: Story = {
 
     const modal = within(
       await page.findByRole('dialog', {
-        name: 'Create a service access token',
+        name: 'Create a Service Access Token',
       })
     );
     const create = modal.getByRole('button', { name: 'Create' });
     expect(create).toBeDisabled();
-    await userEvent.type(modal.getByLabelText(/^Name/), 'build-token');
+    await userEvent.type(
+      modal.getByLabelText(/^Service access token name/),
+      'build-token'
+    );
     await userEvent.type(
       modal.getByLabelText(/^Short description/),
       'Build access'
@@ -462,7 +466,7 @@ export const CreateTokenFromEmptyState: Story = {
     await userEvent.click(
       canvas.getByRole('button', { name: 'Create service access token' })
     );
-    expect(page.getByText('Create a service access token')).toBeInTheDocument();
+    expect(page.getByText('Create a Service Access Token')).toBeInTheDocument();
     await userEvent.click(page.getByRole('button', { name: 'Cancel' }));
   },
 };
@@ -955,6 +959,149 @@ export const ServiceAccessTokenResetFlagDisabled: Story = {
       ).not.toBeInTheDocument()
     );
     expect(canvas.queryByText('build-token')).not.toBeInTheDocument();
+  },
+};
+
+async function openSatDelete(canvas: ReturnType<typeof within>) {
+  const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+  const buttons = row.querySelectorAll('button');
+  await userEvent.click(buttons[buttons.length - 1]);
+  await userEvent.click(
+    await within(document.body).findByText('Delete service access token')
+  );
+  return within(
+    await within(document.body).findByRole('dialog', {
+      name: /Delete service access token\?/,
+    })
+  );
+}
+
+export const DeleteServiceAccessTokenJourney: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([
+        mockServiceAccessToken,
+        mockServiceAccounts[0],
+      ]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const confirmation = await openSatDelete(canvas);
+    expect(
+      confirmation.getByText(/will revoke this token/)
+    ).toBeInTheDocument();
+    expect(confirmation.getByText(/permanently remove it/)).toBeInTheDocument();
+    await userEvent.click(confirmation.getByRole('button', { name: 'Delete' }));
+
+    await waitFor(() =>
+      expect(canvas.queryByText('build-token')).not.toBeInTheDocument()
+    );
+    expect(canvas.getByText('my-api-service')).toBeInTheDocument();
+    expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(canvas.getAllByText(/1 - 1/).length).toBeGreaterThan(0)
+    );
+  },
+};
+
+export const CancelServiceAccessTokenDelete: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([mockServiceAccessToken]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const confirmation = await openSatDelete(canvas);
+    await userEvent.click(confirmation.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole('dialog')
+      ).not.toBeInTheDocument()
+    );
+    expect(canvas.getByText('build-token')).toBeInTheDocument();
+  },
+};
+
+export const FailedServiceAccessTokenDelete: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    msw: {
+      handlers: [
+        http.delete(
+          '*/apis/service_accounts/v1/sat-001',
+          () => new HttpResponse(null, { status: 403 })
+        ),
+        ...createStatefulHandlers([mockServiceAccessToken]),
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const confirmation = await openSatDelete(canvas);
+    await userEvent.click(confirmation.getByRole('button', { name: 'Delete' }));
+    await waitFor(() =>
+      expect(
+        confirmation.getByText(
+          'The service access token could not be deleted. Try again.'
+        )
+      ).toBeInTheDocument()
+    );
+    expect(canvas.getByText('build-token')).toBeInTheDocument();
+  },
+};
+
+export const ServiceAccessTokenDeleteFlagDisabled: Story = {
+  globals: { satFlag: 'disabled' },
+  args: { initialRoute: '/iam/service-accounts/delete/sat-001' },
+  parameters: {
+    msw: {
+      handlers: createStatefulHandlers([mockServiceAccessToken]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('No service accounts yet')).toBeInTheDocument()
+    );
+    expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+    expect(canvas.queryByText('build-token')).not.toBeInTheDocument();
+  },
+};
+
+export const ServiceAccessTokenDeleteWithoutPermission: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    orgAdmin: false,
+    permissions: [],
+    msw: {
+      handlers: createStatefulHandlers([mockServiceAccessToken]),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('build-token')).toBeInTheDocument()
+    );
+    const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+    const buttons = row.querySelectorAll('button');
+    await userEvent.click(buttons[buttons.length - 1]);
+    const deleteAction = await within(document.body).findByText(
+      'Delete service access token'
+    );
+    expect(deleteAction.closest('button')).toBeDisabled();
   },
 };
 
