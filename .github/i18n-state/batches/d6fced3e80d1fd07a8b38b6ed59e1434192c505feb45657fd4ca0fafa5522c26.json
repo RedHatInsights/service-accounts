@@ -306,8 +306,10 @@
       "pullRequestUrl": "https://github.com/RedHatInsights/service-accounts/pull/221",
       "pullRequestBranch": "i18n/phrase-d6fced3e80d1fd07-ko",
       "pullRequestBatchKey": "d6fced3e80d1fd07a8b38b6ed59e1434192c505feb45657fd4ca0fafa5522c26",
-      "pullRequestAssigneesPending": true,
-      "toolingCommitSha": "98848a4729c1f751ea0f784a703a73024257ddb4"
+      "toolingCommitSha": "98848a4729c1f751ea0f784a703a73024257ddb4",
+      "pullRequestAssignees": [
+        "aferd"
+      ]
     },
     "zh_cn": {
       "phase": "pr-created",
