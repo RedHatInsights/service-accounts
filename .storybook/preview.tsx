@@ -93,7 +93,10 @@ const preview: Preview = {
       // Always wrap with FeatureFlagsProvider, but allow stories to skip other decorators
       if (context.parameters.skipGlobalDecorators) {
         return (
-          <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
+          <StorybookMockProvider
+            isOrgAdmin={context.parameters.orgAdmin ?? true}
+            permissions={context.parameters.permissions ?? ['rbac:*:*']}
+          >
             <FeatureFlagsProvider value={featureFlags}>
               <IntlMessagesProvider locale="en">
                 <Story />
@@ -104,7 +107,10 @@ const preview: Preview = {
       }
 
       return (
-        <StorybookMockProvider isOrgAdmin permissions={['rbac:*:*']}>
+        <StorybookMockProvider
+          isOrgAdmin={context.parameters.orgAdmin ?? true}
+          permissions={context.parameters.permissions ?? ['rbac:*:*']}
+        >
           <FeatureFlagsProvider value={featureFlags}>
             <IntlMessagesProvider locale="en">
               <QueryClientProvider client={queryClient}>
