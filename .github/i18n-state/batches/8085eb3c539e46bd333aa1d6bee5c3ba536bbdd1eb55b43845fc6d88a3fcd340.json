@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "key": "8085eb3c539e46bd333aa1d6bee5c3ba536bbdd1eb55b43845fc6d88a3fcd340",
-  "phase": "creating",
+  "phase": "importing",
   "repository": "RedHatInsights/service-accounts",
   "baseRef": "main",
   "sourceCommit": "27095283d995285f0778301998fa79822daf53a2",
@@ -44,7 +44,104 @@
     }
   },
   "createdAt": "2026-11-13T05:23:41.360Z",
-  "jobs": [],
+  "jobs": [
+    {
+      "uid": "xju8jcRq07Q0TA91ne6Pw1",
+      "status": "NEW",
+      "providers": [],
+      "targetLang": "zh_cn",
+      "workflowLevel": 1,
+      "workflowStep": {
+        "name": "Translation",
+        "id": "225677",
+        "uid": "Vm1j1nqsDSxM343cSZb17g",
+        "order": 10,
+        "lqaEnabled": true
+      },
+      "filename": "service-accounts.ui.en.json",
+      "fullFilename": "service-accounts.ui.en.json",
+      "dateDue": null,
+      "dateCreated": "2026-11-13T05:23:46+0000",
+      "updateSourceDate": null,
+      "imported": false,
+      "jobAssignedEmailTemplate": null,
+      "notificationIntervalInMinutes": 0,
+      "continuous": false,
+      "sourceFileUid": "bdTklZs9mBppe1sh69xLO6"
+    },
+    {
+      "uid": "DQ6O8y0JZDmflic9rK5x22",
+      "status": "NEW",
+      "providers": [],
+      "targetLang": "fr",
+      "workflowLevel": 1,
+      "workflowStep": {
+        "name": "Translation",
+        "id": "225677",
+        "uid": "Vm1j1nqsDSxM343cSZb17g",
+        "order": 10,
+        "lqaEnabled": true
+      },
+      "filename": "service-accounts.ui.en.json",
+      "fullFilename": "service-accounts.ui.en.json",
+      "dateDue": null,
+      "dateCreated": "2026-11-13T05:23:46+0000",
+      "updateSourceDate": null,
+      "imported": false,
+      "jobAssignedEmailTemplate": null,
+      "notificationIntervalInMinutes": 0,
+      "continuous": false,
+      "sourceFileUid": "bdTklZs9mBppe1sh69xLO6"
+    },
+    {
+      "uid": "esGDEO9O1jNMjW5kuIV1C0",
+      "status": "NEW",
+      "providers": [],
+      "targetLang": "ko",
+      "workflowLevel": 1,
+      "workflowStep": {
+        "name": "Translation",
+        "id": "225677",
+        "uid": "Vm1j1nqsDSxM343cSZb17g",
+        "order": 10,
+        "lqaEnabled": true
+      },
+      "filename": "service-accounts.ui.en.json",
+      "fullFilename": "service-accounts.ui.en.json",
+      "dateDue": null,
+      "dateCreated": "2026-11-13T05:23:46+0000",
+      "updateSourceDate": null,
+      "imported": false,
+      "jobAssignedEmailTemplate": null,
+      "notificationIntervalInMinutes": 0,
+      "continuous": false,
+      "sourceFileUid": "bdTklZs9mBppe1sh69xLO6"
+    },
+    {
+      "uid": "ea2uc7N6atX58FQbkV6B23",
+      "status": "NEW",
+      "providers": [],
+      "targetLang": "ja",
+      "workflowLevel": 1,
+      "workflowStep": {
+        "name": "Translation",
+        "id": "225677",
+        "uid": "Vm1j1nqsDSxM343cSZb17g",
+        "order": 10,
+        "lqaEnabled": true
+      },
+      "filename": "service-accounts.ui.en.json",
+      "fullFilename": "service-accounts.ui.en.json",
+      "dateDue": null,
+      "dateCreated": "2026-11-13T05:23:46+0000",
+      "updateSourceDate": null,
+      "imported": false,
+      "jobAssignedEmailTemplate": null,
+      "notificationIntervalInMinutes": 0,
+      "continuous": false,
+      "sourceFileUid": "bdTklZs9mBppe1sh69xLO6"
+    }
+  ],
   "warningCount": 0,
   "locales": {
     "fr": {
@@ -59,5 +156,6 @@
     "zh_cn": {
       "phase": "pending"
     }
-  }
+  },
+  "importAsyncRequestId": "1916244699"
 }
