@@ -28,7 +28,8 @@ const StoryFlow = ({
           createToken={async () => {
             if (unsupportedBackend)
               throw new ServiceAccessTokenUnavailableError();
-            if (shouldFail) throw new Error('Example request failed');
+            if (shouldFail)
+              throw new Error('Failed to create service access token (403)');
             return exampleCredentials;
           }}
           onClose={() => setIsOpen(false)}
