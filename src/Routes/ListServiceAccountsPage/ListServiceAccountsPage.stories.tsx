@@ -489,7 +489,7 @@ export const CreateTokenFromPopulatedListWithoutAdminRole: Story = {
     );
     expect(
       within(document.body).getByRole('dialog', {
-        name: 'Create a service access token',
+        name: 'Create a Service Access Token',
       })
     ).toBeInTheDocument();
   },
@@ -517,7 +517,7 @@ export const CreateTokenFromEmptyStateWithoutAdminRole: Story = {
     );
     expect(
       within(document.body).getByRole('dialog', {
-        name: 'Create a service access token',
+        name: 'Create a Service Access Token',
       })
     ).toBeInTheDocument();
   },
