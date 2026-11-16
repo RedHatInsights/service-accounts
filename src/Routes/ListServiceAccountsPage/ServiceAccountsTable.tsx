@@ -136,6 +136,10 @@ const messages = defineMessages({
     id: 'serviceAccounts.table.action.delete',
     defaultMessage: 'Delete service account',
   },
+  actionDeleteToken: {
+    id: 'serviceAccounts.table.action.deleteToken',
+    defaultMessage: 'Delete service access token',
+  },
   paginationOf: {
     id: 'serviceAccounts.table.pagination.of',
     defaultMessage: 'of',
@@ -387,21 +391,47 @@ export const ServiceAccountsTable: FunctionComponent<
           sa.type === 'service_access_token'
             ? 'reset-service-access-token-button'
             : 'reset-credentials-service-account-button',
-        onClick: () => navigate(mergeToBasename(`reset/${sa.id}`)),
+        onClick: () =>
+          navigate(
+            mergeToBasename({
+              pathname: `reset/${sa.id}`,
+              search: searchParams.toString(),
+            })
+          ),
       };
       return sa.type === 'service_access_token'
-        ? [reset]
+        ? [
+            reset,
+            {
+              title: intl.formatMessage(messages.actionDeleteToken),
+              isDisabled: !canChange(sa),
+              ouiaId: 'delete-service-access-token-button',
+              onClick: () =>
+                navigate(
+                  mergeToBasename({
+                    pathname: `delete/${sa.id}`,
+                    search: searchParams.toString(),
+                  })
+                ),
+            },
+          ]
         : [
             reset,
             {
               title: intl.formatMessage(messages.actionDelete),
               isDisabled: !canChange(sa),
               ouiaId: 'delete-service-account-button',
-              onClick: () => navigate(mergeToBasename(`delete/${sa.id}`)),
+              onClick: () =>
+                navigate(
+                  mergeToBasename({
+                    pathname: `delete/${sa.id}`,
+                    search: searchParams.toString(),
+                  })
+                ),
             },
           ];
     },
-    [canChange, navigate, intl]
+    [canChange, navigate, intl, searchParams]
   );
 
   const rows: DataViewTr[] = useMemo(

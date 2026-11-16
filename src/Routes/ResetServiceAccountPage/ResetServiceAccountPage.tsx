@@ -2,7 +2,7 @@ import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFlag } from '@unleash/proxy-client-react';
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { fetchServiceAccount } from '../../shared/fetchServiceAccount';
 import {
   UnexpectedServiceAccessTokenResetResponseError,
@@ -16,8 +16,11 @@ const ResetServiceAccountPage = () => {
   const { clientId } = useParams<{ clientId: string }>();
   const { appAction, auth, getEnvironmentDetails } = useChrome();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const isSatEnabled = useFlag('platform.service-accounts.sat');
+  const returnToList = () =>
+    navigate(mergeToBasename({ pathname: '', search: location.search }));
 
   const query = useQuery({
     queryKey: ['service-account', clientId],
@@ -81,16 +84,16 @@ const ResetServiceAccountPage = () => {
 
   useEffect(() => {
     if (!clientId || query.isError || (isSat && !isSatEnabled)) {
-      navigate(mergeToBasename(''));
+      returnToList();
     } else {
       appAction('reset-service-account-page');
     }
-  }, [clientId, query.isError, isSat, isSatEnabled]);
+  }, [clientId, query.isError, isSat, isSatEnabled, location.search]);
 
   const closeSat = () => {
     mutation.reset();
     queryClient.invalidateQueries({ queryKey: ['service-account', clientId] });
-    navigate(mergeToBasename(''));
+    returnToList();
   };
 
   if (isSat && !isSatEnabled) return null;
@@ -114,9 +117,13 @@ const ResetServiceAccountPage = () => {
       onConfirm={onConfirm}
       isSat={isSat}
       satError={isSat ? satError : undefined}
+      onClose={returnToList}
     />
   ) : (
-    <ServiceAccountNameSecretModal serviceAccount={mutation.data} />
+    <ServiceAccountNameSecretModal
+      serviceAccount={mutation.data}
+      onClose={returnToList}
+    />
   );
 };
 

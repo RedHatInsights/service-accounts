@@ -94,7 +94,7 @@ type Props =
   | {
       serviceAccount: NewServiceAccount;
       serviceAccessToken?: never;
-      onClose?: never;
+      onClose?: () => void;
     }
   | {
       serviceAccount?: never;

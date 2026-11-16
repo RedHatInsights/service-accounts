@@ -3,12 +3,15 @@ import {
   Button,
   Form,
   FormGroup,
+  Icon,
   Modal,
   ModalBody,
   ModalFooter,
   ModalHeader,
+  Popover,
   TextInput,
 } from '@patternfly/react-core';
+import { HelpIcon } from '@patternfly/react-icons';
 import React, { FunctionComponent, useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { ServiceAccessTokenUnavailableError } from '../../shared/createServiceAccessToken';
@@ -18,11 +21,20 @@ import { appendTo } from '../../shared/utils';
 const messages = defineMessages({
   title: {
     id: 'serviceAccounts.token.create.title',
-    defaultMessage: 'Create a service access token',
+    defaultMessage: 'Create a Service Access Token',
   },
   name: {
     id: 'serviceAccounts.token.create.name',
-    defaultMessage: 'Name',
+    defaultMessage: 'Service access token name',
+  },
+  namePopoverBody: {
+    id: 'serviceAccounts.token.create.namePopoverBody',
+    defaultMessage:
+      'Please provide a simple and short name for the service access token you are creating',
+  },
+  nameAriaLabel: {
+    id: 'serviceAccounts.token.create.nameAriaLabel',
+    defaultMessage: 'name of service access token',
   },
   description: {
     id: 'serviceAccounts.token.create.description',
@@ -147,6 +159,25 @@ export const CreateServiceAccessTokenFlow: FunctionComponent<
             isRequired
             label={intl.formatMessage(messages.name)}
             fieldId="sat-name"
+            labelHelp={
+              <Popover
+                headerContent={intl.formatMessage(messages.name)}
+                bodyContent={intl.formatMessage(messages.namePopoverBody)}
+              >
+                <Button
+                  aria-label={intl.formatMessage(messages.nameAriaLabel)}
+                  aria-describedby="sat-name"
+                  className="pf-c-form__group-label-help"
+                  type="button"
+                  onClick={(event) => event.preventDefault()}
+                  variant="plain"
+                >
+                  <Icon>
+                    <HelpIcon />
+                  </Icon>
+                </Button>
+              </Popover>
+            }
           >
             <TextInput
               id="sat-name"

@@ -12,9 +12,7 @@ import {
 } from '@patternfly/react-core';
 import React, { VoidFunctionComponent } from 'react';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
-import { AppLink } from '../../shared/AppLink';
 import { appendTo } from '../../shared/utils';
-import { useNavigate } from 'react-router-dom';
 
 const messages = defineMessages({
   title: {
@@ -66,6 +64,7 @@ export type ResetModalProps = {
   name: string | undefined;
   isResetting: boolean;
   onConfirm: () => void;
+  onClose: () => void;
   isSat?: boolean;
   satError?: 'request' | 'unexpected' | 'missingUsername';
 };
@@ -74,10 +73,10 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
   name,
   isResetting,
   onConfirm,
+  onClose,
   isSat = false,
   satError,
 }) => {
-  const navigate = useNavigate();
   const intl = useIntl();
   const title = intl.formatMessage(isSat ? messages.satTitle : messages.title);
   return (
@@ -87,7 +86,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
       isOpen={true}
       ouiaId={'modal-reset-service-account'}
       appendTo={appendTo}
-      onClose={isSat && isResetting ? undefined : () => navigate('')}
+      onClose={isSat && isResetting ? undefined : onClose}
     >
       <ModalHeader title={title} />
       <ModalBody>
@@ -135,7 +134,7 @@ export const ResetModal: VoidFunctionComponent<ResetModalProps> = ({
         <Button
           key="cancel"
           variant="link"
-          component={(props) => <AppLink {...props} to={''} />}
+          onClick={onClose}
           isDisabled={isSat && isResetting}
           ouiaId="resetmodal-cancel-button"
         >

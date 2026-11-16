@@ -77,6 +77,9 @@
   "serviceAccounts.delete.button.delete": {
     "defaultMessage": "Delete"
   },
+  "serviceAccounts.delete.error": {
+    "defaultMessage": "The service account could not be deleted. Try again."
+  },
   "serviceAccounts.delete.loading": {
     "defaultMessage": "Loading service account information"
   },
@@ -130,6 +133,9 @@
   },
   "serviceAccounts.table.action.delete": {
     "defaultMessage": "Delete service account"
+  },
+  "serviceAccounts.table.action.deleteToken": {
+    "defaultMessage": "Delete service access token"
   },
   "serviceAccounts.table.action.resetCredentials": {
     "defaultMessage": "Reset credentials"
@@ -210,10 +216,16 @@
     "defaultMessage": "The service access token could not be created. Try again."
   },
   "serviceAccounts.token.create.name": {
-    "defaultMessage": "Name"
+    "defaultMessage": "Service access token name"
+  },
+  "serviceAccounts.token.create.nameAriaLabel": {
+    "defaultMessage": "name of service access token"
+  },
+  "serviceAccounts.token.create.namePopoverBody": {
+    "defaultMessage": "Please provide a simple and short name for the service access token you are creating"
   },
   "serviceAccounts.token.create.title": {
-    "defaultMessage": "Create a service access token"
+    "defaultMessage": "Create a Service Access Token"
   },
   "serviceAccounts.token.create.unavailable": {
     "defaultMessage": "Service access token creation is not available in this environment yet. Try again after the SSO update is deployed."
@@ -238,6 +250,18 @@
   },
   "serviceAccounts.token.credentials.username": {
     "defaultMessage": "Username"
+  },
+  "serviceAccounts.token.delete.body": {
+    "defaultMessage": "Deleting {name} will revoke this token, terminate any active sessions, and permanently remove it. This action cannot be undone."
+  },
+  "serviceAccounts.token.delete.error": {
+    "defaultMessage": "The service access token could not be deleted. Try again."
+  },
+  "serviceAccounts.token.delete.notification": {
+    "defaultMessage": "Service access token \"{name}\" has been deleted."
+  },
+  "serviceAccounts.token.delete.title": {
+    "defaultMessage": "Delete service access token?"
   },
   "serviceAccounts.token.reset.body": {
     "defaultMessage": "Resetting the token for {name} will make the current token stop working. The username will stay the same."
