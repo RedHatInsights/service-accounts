@@ -467,6 +467,58 @@ export const CreateTokenFromEmptyState: Story = {
   },
 };
 
+export const CreateTokenFromPopulatedListWithoutAdminRole: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    orgAdmin: false,
+    permissions: [],
+    msw: { handlers: createStatefulHandlers(mockServiceAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText('my-api-service')).toBeInTheDocument()
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Create new' }));
+    await userEvent.click(
+      within(document.body).getByText('Service access token')
+    );
+    expect(
+      within(document.body).getByRole('dialog', {
+        name: 'Create a service access token',
+      })
+    ).toBeInTheDocument();
+  },
+};
+
+export const CreateTokenFromEmptyStateWithoutAdminRole: Story = {
+  globals: { satFlag: 'enabled' },
+  parameters: {
+    orgAdmin: false,
+    permissions: [],
+    msw: { handlers: createStatefulHandlers([]) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(
+        canvas.getByText('No service accounts or service access tokens yet')
+      ).toBeInTheDocument()
+    );
+    expect(
+      canvas.getByRole('link', { name: 'Create service account' })
+    ).toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Create service access token' })
+    );
+    expect(
+      within(document.body).getByRole('dialog', {
+        name: 'Create a service access token',
+      })
+    ).toBeInTheDocument();
+  },
+};
+
 export const FilteredNoResults: Story = {
   args: { initialRoute: '/iam/service-accounts?name=missing' },
   parameters: {
