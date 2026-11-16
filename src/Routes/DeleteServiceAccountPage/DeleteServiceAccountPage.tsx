@@ -105,11 +105,11 @@ const DeleteServiceAccountPage = () => {
     }
   }, [clientId, query.isError, isSat, isSatEnabled]);
 
-  if (!query.data || (isSat && !isSatEnabled)) return null;
+  if (isSat && !isSatEnabled) return null;
 
   return (
     <DeleteModal
-      name={query.data.name}
+      name={query.data?.name}
       isDeleting={mutation.isLoading}
       isError={mutation.isError}
       isSat={isSat}
