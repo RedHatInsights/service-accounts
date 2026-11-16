@@ -50,10 +50,6 @@ const DeleteServiceAccountPage = () => {
 
   const isSat = query.data?.type === 'service_access_token';
   const returnToList = (resetPage = false) => {
-    if (!isSat) {
-      navigate(mergeToBasename(''));
-      return;
-    }
     const params = new URLSearchParams(location.search);
     if (resetPage) params.delete('page');
     navigate(mergeToBasename({ pathname: '', search: params.toString() }));
@@ -91,7 +87,7 @@ const DeleteServiceAccountPage = () => {
           { name: query.data?.name }
         ),
       });
-      returnToList(isSat);
+      returnToList(true);
     },
   });
 
@@ -99,11 +95,11 @@ const DeleteServiceAccountPage = () => {
 
   useEffect(() => {
     if (!clientId || query.isError || (isSat && !isSatEnabled)) {
-      navigate(mergeToBasename(''));
+      returnToList();
     } else {
       appAction('delete-service-account-page');
     }
-  }, [clientId, query.isError, isSat, isSatEnabled]);
+  }, [clientId, query.isError, isSat, isSatEnabled, location.search]);
 
   if (isSat && !isSatEnabled) return null;
 

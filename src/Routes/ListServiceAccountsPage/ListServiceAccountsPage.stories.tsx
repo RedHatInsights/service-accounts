@@ -800,8 +800,102 @@ export const ResetServiceAccountJourney: Story = {
   },
 };
 
+export const KeepFiltersAcrossServiceAccountActions: Story = {
+  args: { initialRoute: '/iam/service-accounts?name=my-api-service' },
+  parameters: {
+    msw: { handlers: createStatefulHandlers(mockServiceAccounts) },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(
+        canvas.getByRole('row', { name: /my-api-service/ })
+      ).toBeInTheDocument()
+    );
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+
+    const row = canvas.getByRole('row', { name: /my-api-service/ });
+    const buttons = row.querySelectorAll('button');
+    await userEvent.click(buttons[buttons.length - 1]);
+    await userEvent.click(
+      await within(document.body).findByText('Reset credentials')
+    );
+    const reset = within(
+      await within(document.body).findByRole('dialog', {
+        name: 'Reset service account credentials?',
+      })
+    );
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+    await userEvent.click(reset.getByRole('button', { name: 'Cancel' }));
+    await waitForModalClose();
+
+    const updatedButtons = canvas
+      .getByRole('row', { name: /my-api-service/ })
+      .querySelectorAll('button');
+    await userEvent.click(updatedButtons[updatedButtons.length - 1]);
+    await userEvent.click(
+      await within(document.body).findByText('Delete service account')
+    );
+    const deletion = within(await within(document.body).findByRole('dialog'));
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+    await userEvent.click(deletion.getByRole('button', { name: 'Cancel' }));
+    await waitForModalClose();
+    expect(
+      canvas.getByRole('row', { name: /my-api-service/ })
+    ).toBeInTheDocument();
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+
+    const resetButtons = canvas
+      .getByRole('row', { name: /my-api-service/ })
+      .querySelectorAll('button');
+    await userEvent.click(resetButtons[resetButtons.length - 1]);
+    await userEvent.click(
+      await within(document.body).findByText('Reset credentials')
+    );
+    await userEvent.click(
+      within(await within(document.body).findByRole('dialog')).getByRole(
+        'button',
+        { name: 'Reset' }
+      )
+    );
+    const credentials = within(
+      await within(document.body).findByRole('dialog', {
+        name: 'Service account credentials',
+      })
+    );
+    await userEvent.click(
+      credentials.getByLabelText('I have copied the client ID and secret')
+    );
+    await userEvent.click(credentials.getByRole('button', { name: 'Close' }));
+    await waitForModalClose();
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+
+    const deleteButtons = canvas
+      .getByRole('row', { name: /my-api-service/ })
+      .querySelectorAll('button');
+    await userEvent.click(deleteButtons[deleteButtons.length - 1]);
+    await userEvent.click(
+      await within(document.body).findByText('Delete service account')
+    );
+    await userEvent.click(
+      within(await within(document.body).findByRole('dialog')).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+    await waitFor(() =>
+      expect(
+        canvas.getByText(
+          'No results match the filter criteria. Clear all filters and try again.'
+        )
+      ).toBeInTheDocument()
+    );
+    expect(canvas.queryByText('data-pipeline')).not.toBeInTheDocument();
+  },
+};
+
 async function openSatReset(canvas: ReturnType<typeof within>) {
-  const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+  const row = canvas.getByRole('row', { name: /build-token/ });
   const buttons = row.querySelectorAll('button');
   await userEvent.click(buttons[buttons.length - 1]);
   await userEvent.click(
@@ -816,17 +910,24 @@ async function openSatReset(canvas: ReturnType<typeof within>) {
 
 export const ResetServiceAccessTokenJourney: Story = {
   globals: { satFlag: 'enabled' },
+  args: { initialRoute: '/iam/service-accounts?name=build-token' },
   parameters: {
     msw: {
-      handlers: createStatefulHandlers([mockServiceAccessToken]),
+      handlers: createStatefulHandlers([
+        mockServiceAccessToken,
+        mockServiceAccounts[0],
+      ]),
     },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const page = within(document.body);
     await waitFor(() =>
-      expect(canvas.getByText('build-token')).toBeInTheDocument()
+      expect(
+        canvas.getByRole('row', { name: /build-token/ })
+      ).toBeInTheDocument()
     );
+    expect(canvas.queryByText('my-api-service')).not.toBeInTheDocument();
     expect(canvas.getByText('Token').closest('.pf-v6-c-label')).toHaveClass(
       'pf-m-blue'
     );
@@ -864,12 +965,13 @@ export const ResetServiceAccessTokenJourney: Story = {
     await waitFor(() =>
       expect(page.queryByDisplayValue(/^new-secret-/)).not.toBeInTheDocument()
     );
+    expect(canvas.queryByText('my-api-service')).not.toBeInTheDocument();
     const secondConfirmation = await openSatReset(canvas);
     expect(
       secondConfirmation.queryByDisplayValue(/^new-secret-/)
     ).not.toBeInTheDocument();
     await userEvent.click(
-      secondConfirmation.getByRole('link', { name: 'Cancel' })
+      secondConfirmation.getByRole('button', { name: 'Cancel' })
     );
   },
 };
@@ -963,7 +1065,7 @@ export const ServiceAccessTokenResetFlagDisabled: Story = {
 };
 
 async function openSatDelete(canvas: ReturnType<typeof within>) {
-  const row = canvas.getByText('build-token').closest('tr') as HTMLElement;
+  const row = canvas.getByRole('row', { name: /build-token/ });
   const buttons = row.querySelectorAll('button');
   await userEvent.click(buttons[buttons.length - 1]);
   await userEvent.click(
@@ -989,7 +1091,9 @@ export const DeleteServiceAccessTokenJourney: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() =>
-      expect(canvas.getByText('build-token')).toBeInTheDocument()
+      expect(
+        canvas.getByRole('row', { name: /build-token/ })
+      ).toBeInTheDocument()
     );
     const confirmation = await openSatDelete(canvas);
     expect(
@@ -1011,15 +1115,21 @@ export const DeleteServiceAccessTokenJourney: Story = {
 
 export const CancelServiceAccessTokenDelete: Story = {
   globals: { satFlag: 'enabled' },
+  args: { initialRoute: '/iam/service-accounts?name=build-token' },
   parameters: {
     msw: {
-      handlers: createStatefulHandlers([mockServiceAccessToken]),
+      handlers: createStatefulHandlers([
+        mockServiceAccessToken,
+        mockServiceAccounts[0],
+      ]),
     },
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() =>
-      expect(canvas.getByText('build-token')).toBeInTheDocument()
+      expect(
+        canvas.getByRole('row', { name: /build-token/ })
+      ).toBeInTheDocument()
     );
     const confirmation = await openSatDelete(canvas);
     await userEvent.click(confirmation.getByRole('button', { name: 'Cancel' }));
@@ -1028,7 +1138,10 @@ export const CancelServiceAccessTokenDelete: Story = {
         within(document.body).queryByRole('dialog')
       ).not.toBeInTheDocument()
     );
-    expect(canvas.getByText('build-token')).toBeInTheDocument();
+    expect(
+      canvas.getByRole('row', { name: /build-token/ })
+    ).toBeInTheDocument();
+    expect(canvas.queryByText('my-api-service')).not.toBeInTheDocument();
   },
 };
 

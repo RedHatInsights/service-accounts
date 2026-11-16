@@ -391,7 +391,13 @@ export const ServiceAccountsTable: FunctionComponent<
           sa.type === 'service_access_token'
             ? 'reset-service-access-token-button'
             : 'reset-credentials-service-account-button',
-        onClick: () => navigate(mergeToBasename(`reset/${sa.id}`)),
+        onClick: () =>
+          navigate(
+            mergeToBasename({
+              pathname: `reset/${sa.id}`,
+              search: searchParams.toString(),
+            })
+          ),
       };
       return sa.type === 'service_access_token'
         ? [
@@ -415,7 +421,13 @@ export const ServiceAccountsTable: FunctionComponent<
               title: intl.formatMessage(messages.actionDelete),
               isDisabled: !canChange(sa),
               ouiaId: 'delete-service-account-button',
-              onClick: () => navigate(mergeToBasename(`delete/${sa.id}`)),
+              onClick: () =>
+                navigate(
+                  mergeToBasename({
+                    pathname: `delete/${sa.id}`,
+                    search: searchParams.toString(),
+                  })
+                ),
             },
           ];
     },
