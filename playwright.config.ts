@@ -27,13 +27,13 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for navigation
-    // In CI/Konflux: uses HCC_ENV_URL, E2E_HCC_ENV_URL, or E2E_BASE_URL (e.g., https://stage.foo.redhat.com:1337)
+    // Explicit Playwright proxy URL takes precedence over the upstream HCC URL.
     // Locally: uses localhost
     baseURL:
+      process.env.PLAYWRIGHT_BASE_URL ||
       process.env.HCC_ENV_URL ||
       process.env.E2E_HCC_ENV_URL ||
       process.env.E2E_BASE_URL ||
-      process.env.PLAYWRIGHT_BASE_URL ||
       'http://localhost:1337',
 
     // Collect trace on first retry of failed test
