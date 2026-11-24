@@ -44,6 +44,10 @@ Update `appUrl` string inside `fec.config.js` according to your application URL.
 
 ## Local i18n validation
 
+Run `npm run lint:translations` to compare the catalog with a fresh extraction without
+modifying it. This check works in source archives and build contexts without `.git`.
+If it fails, run `npm run translations:extract` and commit the updated catalog.
+
 The locale-validation workflow builds the i18n CLI, but `npm ci` in this repository does not
 install it. Until `@redhat-cloud-services/i18n-pipeline` is published, build the exact tooling
 revision pinned by `.github/workflows/locale-validation.yml` (currently
